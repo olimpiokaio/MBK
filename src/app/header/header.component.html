@@ -1,0 +1,16 @@
+
+
+<header class="app-header" [class.faded]="faded" (mouseenter)="onInteract()">
+  <div class="logo">
+    <img src="assets/logo.png" alt="Logo" />
+  </div>
+  <div class="controls">
+    <button class="icon-btn" (click)="onTogglePlay()" aria-label="Pausar ou retomar música de fundo" title="Pausar/Retomar">
+      <span *ngIf="!isPaused" aria-hidden="true">⏸</span>
+      <span *ngIf="isPaused" aria-hidden="true">▶</span>
+    </button>
+    <button class="icon-btn" (click)="onNext()" aria-label="Próxima música" title="Próxima">
+      <span aria-hidden="true">⏭</span>
+    </button>
+  </div>
+</header>

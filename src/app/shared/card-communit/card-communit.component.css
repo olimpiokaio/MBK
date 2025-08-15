@@ -1,0 +1,41 @@
+.content-card-communit {
+  width: 88%;
+  margin: auto;
+  margin-bottom: 0.4rem;
+  cursor: pointer;
+  will-change: transform, filter;
+}.content-card-communit::before {
+  content: "";
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, #3b3b3ba4 10%, transparent 10%);
+  background-size: 5px 5px;
+  z-index: -1;
+}
+
+.card_header {
+  text-align: center;
+  font-size: 1.2rem;
+  padding-top: 1rem;
+}
+
+.card_content {
+  display: block;
+  text-align: center;
+  overflow: hidden;
+  border-radius:2rem;
+  width: 90%;
+  margin: auto;
+}
+.card_content img {
+  height: 5rem;
+  width: auto;
+  border-radius: 2rem;
+}
+
+.card_footer {
+  padding: 1rem 0.4rem;
+}

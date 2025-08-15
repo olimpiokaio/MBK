@@ -1,0 +1,12 @@
+<div class="content-card-communit" [style]="getStyle()">
+  <div class="card_header">
+    <h1>{{ community().name }}</h1>
+    <span>team</span>
+  </div>
+  <div class="card_content" [style]="getStyle()">
+    <img [src]='community().logoUrl' />
+  </div>
+  <div class="card_footer">
+    <span>members: {{ community().membersQuantity }}</span> / <span>Origem {{ community().dateCreate.getFullYear() }}</span>
+  </div>
+</div>

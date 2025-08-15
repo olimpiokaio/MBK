@@ -1,0 +1,6 @@
+<ng-container *ngIf="back; else linkBtn">
+  <button class="btn-back" (click)="onBack()" [attr.aria-label]="ariaLabel || 'Voltar'">{{ label }}</button>
+</ng-container>
+<ng-template #linkBtn>
+  <button class="btn-back" [routerLink]="route" [attr.aria-label]="ariaLabel || 'Voltar para Home'">{{ label }}</button>
+</ng-template>

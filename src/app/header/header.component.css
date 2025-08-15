@@ -1,0 +1,50 @@
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.app-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px 10px;
+  transition: opacity 300ms ease, background-color 300ms ease;
+  background: transparent;
+  opacity: 1;
+}
+
+.app-header.faded {
+  opacity: 0.35; /* levemente visível */
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 200ms ease, transform 100ms ease, opacity 300ms ease;
+  opacity: 0.85; /* botões discretos */
+}
+
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  background: rgba(0,0,0,0.55);
+  opacity: 1;
+  outline: none;
+}
+
+.icon-btn:active {
+  transform: scale(0.96);
+}

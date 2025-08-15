@@ -1,0 +1,13 @@
+<section class="content-play">
+  <div class="top-bar">
+    <app-back-button [route]="'/'" ariaLabel="Voltar para Home" label="← VOLTAR" />
+  </div>
+  <div>
+    <span class="title">Selecte a Comunity</span>
+  </div>
+  <div class="list-communities">
+    @for (communit of comunitys; track $index) {
+      <app-card-communit [community]="communit" (click)="onSelected(communit.id)"></app-card-communit>
+    }
+  </div>
+</section>

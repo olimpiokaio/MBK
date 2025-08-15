@@ -1,0 +1,23 @@
+<div class="home-profile">
+  <div class="cosmic-card">
+    <h1>{{ player().playerName }}</h1>
+    <div class="cosmic-energy"></div>
+    <div class="player-holo">
+      <img [src]="player().playerImage" alt="NBA Star" />
+    </div>
+    <div class="cosmic-stats">
+      <div class="cosmic-stat">
+        <div class="stat-value">{{ player().age }}</div>
+        <div class="stat-label">age</div>
+      </div>
+      <div class="cosmic-stat">
+        <div class="stat-value">{{ player().level }}</div>
+        <div class="stat-label">level</div>
+      </div>
+      <div class="cosmic-stat">
+        <div class="stat-value">{{ player().totalPoints }}</div>
+        <div class="stat-label">points</div>
+      </div>
+    </div>
+  </div>
+</div>
