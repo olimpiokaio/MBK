@@ -62,6 +62,7 @@ export class AppComponent {
       '&playsinline=1' +
       '&mute=1' +
       '&loop=1' +
+      '&shuffle=1' +
       '&playlist=' + playlistParam +
       '&enablejsapi=1' +
       '&origin=' + origin
@@ -119,7 +120,9 @@ export class AppComponent {
     this.postToPlayer({ event: 'command', func: 'unMute', args: [] });
     // 2) Set volume to a reasonable level
     this.postToPlayer({ event: 'command', func: 'setVolume', args: [50] });
-    // 3) Play (in case it was paused)
+    // 3) Enable shuffle for playlist playback
+    this.postToPlayer({ event: 'command', func: 'setShuffle', args: [true] });
+    // 4) Play (in case it was paused)
     this.postToPlayer({ event: 'command', func: 'playVideo', args: [] });
 
     // Some browsers require a slight delay before unmute/play takes effect; retry a couple of times
