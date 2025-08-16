@@ -4,6 +4,7 @@ import { PlayersService } from '../services/players.service';
 import { Player } from '../shared/types/player.model';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
 import { NarratorService } from '../services/narrator.service';
+import { StatisticsService } from '../services/statistics.service';
 import { TeamPlayersColumnComponent } from '../shared/team-players-column/team-players-column.component';
 import { CardQualificacaoComponent } from '../shared/card-qualificacao/card-qualificacao.component';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
@@ -19,6 +20,7 @@ export class MatchComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   private playersService = inject(PlayersService);
   private narrator = inject(NarratorService);
+  private stats = inject(StatisticsService);
 
   // Loading state
   loadingPlayers = signal<boolean>(true);
@@ -159,8 +161,12 @@ export class MatchComponent implements OnDestroy {
   startGame() {
     // initialize player points map
     const map = new Map<string, number>();
-    [...this.teamA(), ...this.teamB()].forEach(p => map.set(p.playerName, 0));
+    const playersInMatch = [...this.teamA(), ...this.teamB()];
+    playersInMatch.forEach(p => map.set(p.playerName, 0));
     this.playerPoints.set(map);
+
+    // initialize statistics service for this match
+    this.stats.startMatch(playersInMatch);
 
     // reset scores and timer
     this.scoreA.set(0);
@@ -230,6 +236,9 @@ export class MatchComponent implements OnDestroy {
     if (delta === 0) return;
     map.set(player.playerName, target);
     this.playerPoints.set(map);
+
+    // update statistics service with player's new match total
+    try { this.stats.recordPoints(player, target); } catch {}
 
     // update team score with the same delta and clamp to 0
     let newScoreA = this.scoreA();
@@ -308,8 +317,20 @@ export class MatchComponent implements OnDestroy {
     // auto-close adjust modal if open
     this.closeModal();
 
-    // Narrate end of game with winner and MVP
+    // Update statistics service with final match data and apply effects
     const w = this.winner();
+    const winners = w === 'A' ? this.teamA() : w === 'B' ? this.teamB() : [];
+    try {
+      // Ensure points are synced (in case some were not recorded via addPoints for any reason)
+      for (const p of [...this.teamA(), ...this.teamB()]) {
+        this.stats.recordPoints(p, this.getPlayerMatchPoints(p));
+      }
+      this.stats.setWinners(winners);
+      this.stats.setMVP(this.mvpPlayer());
+      this.stats.finalizeAndApply();
+    } catch {}
+
+    // Narrate end of game with winner and MVP
     const mvpName = this.mvpPlayer()?.playerName ?? null;
     if (w !== null) {
       this.narrator.announceEnd(w, mvpName);
