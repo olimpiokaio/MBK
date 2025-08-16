@@ -13,11 +13,11 @@
     <!-- Team chooser blocks -->
     <div class="teams-select">
       <button class="team-card" [class.active]="selectedTeam() === 'A'" (click)="chooseTeam('A')" type="button">
-        <div class="team-title">Time A</div>
+        <h1 class="team-title">Time A</h1>
         <div class="team-count">{{ teamA().length }} / {{ maxPerTeam }}</div>
       </button>
       <button class="team-card" [class.active]="selectedTeam() === 'B'" (click)="chooseTeam('B')" type="button">
-        <div class="team-title">Time B</div>
+        <h1 class="team-title">Time B</h1>
         <div class="team-count">{{ teamB().length }} / {{ maxPerTeam }}</div>
       </button>
     </div>
@@ -91,9 +91,10 @@
       <header class="game-header">
         <h2 class="game-title">Street Game • {{ communityName() || ('Comunidade #' + communityId()) }}</h2>
         <div class="timer">
+          <button class="mute-btn pause-btn" type="button" (click)="toggleNarrator()">{{ narratorOn() ? 'Mutar Narrador' : 'Ativar Narrador' }}</button>
+          <button class="speak-score-btn pause-btn" type="button" (click)="speakCurrentScore()">Falar Placar</button>
           <span class="time-display">{{ formatTime(timeLeft()) }}</span>
           <button class="pause-btn" type="button" (click)="toggleTimer()">{{ running() ? 'Pausar' : 'Continuar' }}</button>
-          <button class="mute-btn" type="button" (click)="toggleNarrator()">{{ narratorOn() ? 'Mutar Narrador' : 'Ativar Narrador' }}</button>
         </div>
       </header>
 
@@ -106,10 +107,6 @@
           <div class="label">Time B</div>
           <div class="value">{{ scoreB() }}</div>
         </div>
-      </div>
-
-      <div class="score-actions">
-        <button class="speak-score-btn" type="button" (click)="speakCurrentScore()">Falar Placar</button>
       </div>
 
       <div class="players-columns">

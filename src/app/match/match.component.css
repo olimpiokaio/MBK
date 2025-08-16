@@ -57,7 +57,7 @@
   gap: 0.8rem;
   padding: 0.8rem;
   border-radius: 14px;
-  border: 2px solid rgba(255,255,255,0.7);
+  border: 2px solid rgba(59, 137, 255, 0.05);
   background:
     radial-gradient(circle at 20% -30%, rgba(255, 196, 0, 0.15), transparent 60%),
     radial-gradient(circle at 120% 130%, rgba(209, 0, 80, 0.12), transparent 60%),
@@ -184,6 +184,8 @@
 .team-card.active {
   border-color: var(--gold-500);
   box-shadow: 0 0 0 2px rgba(255,196,0,0.25);
+  background: #ffc400;
+  color: #101028;
 }
 .team-title { font-weight: 700; letter-spacing: 0.3px; }
 .team-count { font-variant-numeric: tabular-nums; opacity: 0.95; }
@@ -192,11 +194,11 @@
 
 /* Selection states for player cards */
 .player-card.selected {
-  border-color: #36d36a;
+  border-color: #f6f6f6;
   box-shadow: 0 0 0 2px rgba(54,211,106,0.25), 0 12px 28px rgba(0,0,0,0.55);
 }
 .player-card.disabled {
-  opacity: 0.55;
+  opacity: 0.35;
   filter: grayscale(30%);
   cursor: not-allowed;
 }
@@ -217,10 +219,11 @@
 /* existing styles above ... */
 
 .start-btn {
+  font-weight: bold;
   margin-left: 0.6rem;
   padding: 0.5rem 0.9rem;
   border-radius: 8px;
-  border: 1px solid var(--gold-500);
+  border: 2px solid #FFC400FF;
   background: linear-gradient(135deg, rgba(255,196,0,0.2), rgba(209,0,80,0.2));
   color: var(--ice);
   cursor: pointer;
@@ -253,10 +256,15 @@
 .pause-btn { padding: 0.45rem 0.7rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.5); background: rgba(0,0,0,0.25); color: var(--ice); cursor: pointer; }
 .pause-btn:hover { border-color: var(--gold-500); }
 
-.scoreboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+.scoreboard {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1rem 0;
+}
 .score { padding: 0.8rem; border-radius: 12px; border: 2px dashed rgba(255,255,255,0.4); background: rgba(0,0,0,0.35); text-align: center; }
 .score .label { font-weight: 700; opacity: 0.95; }
-.score .value { font-size: 2rem; font-weight: 800; letter-spacing: 1px; }
+.score .value { font-size: 5rem; font-weight: 800; letter-spacing: 1px; }
 .team-a { border-color: #36d36a; }
 .team-b { border-color: #6d3dff; }
 
@@ -265,7 +273,7 @@
 .team-column h3 { margin: 0 0 0.8rem; }
 .player-row { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; padding: 0.6rem 0.2rem; border-bottom: 1px dashed rgba(255,255,255,0.12); }
 .player-row:last-child { border-bottom: none; }
-.avatar-sm { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
+.avatar-sm { width: 56px; height: 56px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; }
 .player-row .info { display: flex; align-items: center; gap: 0.6rem; }
 .player-row .name { font-weight: 600; }
 .player-row .match-pts { font: 700 0.95rem ui-monospace, monospace; opacity: 0.95; }
