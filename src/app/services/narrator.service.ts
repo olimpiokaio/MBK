@@ -1,17 +1,32 @@
 import { Injectable } from '@angular/core';
 
 /**
- * Narração de partidas usando Web Speech API (PT-BR, voz masculina se possível).
- * Agora com comentários criativos, placar detalhado e brincadeiras com quem ainda não pontuou.
+ * Narrador (Web Speech API) robusto com chunking + fila sequencial.
+ * - Compatível com Chrome, Edge e Safari (incl. iOS)
+ * - Carrega vozes de forma confiável (voiceschanged + tentativas)
+ * - Divide texto em sentenças e por tamanho (padrão: 240 chars; mobile: 200)
+ * - Fala um chunk por vez, aguardando onend antes do próximo
+ * - Evita cancelar no meio da fila; cancel() usado apenas em stop()
+ * - Pequeno delay (≈8ms) em cada speak para estabilidade (iOS Safari)
+ *
+ * API pública:
+ *  - speak(text, opts?): Promise<void>
+ *      opts: { voiceName?, rate?, pitch?, volume?, maxChunkChars? }
+ *  - stop(): void — interrompe imediatamente e limpa fila
+ *  - isSpeaking(): boolean — indica fala em andamento/pendente
+ *  - setVoiceByName(name: string): void — aplica antes da próxima fala
+ *
+ * Recomendações de parâmetros (podem variar por navegador/voz):
+ *  - rate: 0.9–1.2 (padrão ajustado por estilo)
+ *  - pitch: 0.9–1.1
+ *  - volume: 0.8–1.0
  */
 @Injectable({ providedIn: 'root' })
 export class NarratorService {
-  private enabled = true; // pode ser alternado futuramente
+  private enabled = (typeof localStorage !== 'undefined' ? (localStorage.getItem('narrator.enabled') !== 'false') : true); // persistido
   private voice: SpeechSynthesisVoice | null = null;
   private voicesLoaded = false;
   private unlocked = false; // desbloqueio por gesto do usuário (necessário em vários navegadores)
-  private queue: Array<{ text: string; opts?: { rate?: number; pitch?: number; volume?: number } }> = [];
-  private loadRetry = 0;
 
   // Estilo de narração (aproximação): padrão ou "romulo" (energético)
   private style: 'default' | 'romulo' = (typeof localStorage !== 'undefined' && (localStorage.getItem('narrator.style') as any)) || 'romulo';
@@ -27,6 +42,12 @@ export class NarratorService {
   private get baseRate() { return this.style === 'romulo' ? 1.15 : 1.0; }
   private get basePitch() { return this.style === 'romulo' ? 1.0 : 0.9; }
   private get baseVolume() { return 1.0; }
+
+  // Fila sequencial e controle de estado para narração robusta
+  private _chain: Promise<void> = Promise.resolve();
+  private _stopRequested = false;
+  private _currentUtterance: SpeechSynthesisUtterance | null = null;
+  private _pendingCount = 0; // chunks pendentes na fila atual
 
   /**
    * Sorteia um item de um array com leve proteção contra repetição imediata.
@@ -61,6 +82,17 @@ export class NarratorService {
 
   setEnabled(on: boolean) {
     this.enabled = on;
+    try { localStorage.setItem('narrator.enabled', String(on)); } catch {}
+    if (!on) this.stop();
+  }
+
+  /** Estado atual do narrador (mutado = false) */
+  public isEnabled(): boolean { return this.enabled; }
+
+  /** Alterna estado do narrador e retorna o novo estado */
+  public toggleEnabled(): boolean {
+    this.setEnabled(!this.enabled);
+    return this.enabled;
   }
 
   // Define estilo "Rômulo" energizado
@@ -95,9 +127,7 @@ export class NarratorService {
       const list = window.speechSynthesis.getVoices();
       this.voice = this.pickPortugueseMaleVoice(list);
       this.voicesLoaded = Array.isArray(list) && list.length > 0;
-      if (this.voicesLoaded && this.unlocked) {
-        this.flushQueue();
-      }
+      // Quando as vozes estiverem disponíveis, próximas falas usarão a voz correta.
     } catch {
       this.voice = null;
     }
@@ -154,65 +184,225 @@ export class NarratorService {
     );
   }
 
-  private speak(text: string, opts?: { rate?: number; pitch?: number; volume?: number }) {
-    if (!this.enabled) return;
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  /**
+   * API pública robusta para falar um texto com chunking e fila sequencial.
+   * - Divide o texto em pedaços curtos (sentenças e limite de caracteres)
+   * - Aguarda onend de cada pedaço antes do próximo
+   * - Não usa cancel() no meio da fila (apenas em stop())
+   */
+  public speak(
+    text: string,
+    opts?: { voiceName?: string; rate?: number; pitch?: number; volume?: number; maxChunkChars?: number }
+  ): Promise<void> {
+    if (!this.enabled) return Promise.resolve();
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return Promise.resolve();
 
-    // Se ainda não há vozes carregadas ou o áudio não foi desbloqueado, enfileira
-    if (!this.voicesLoaded || !this.unlocked) {
-      this.queue.push({ text, opts });
-      this.tryLoadVoicesLater();
-      return;
-    }
+    // Atualiza voz preferida se enviada nesta chamada (aplica a partir da próxima utterance)
+    if (opts?.voiceName) this.setVoiceByName(opts.voiceName);
 
-    this.flushIfStuck();
-    this.speakNow(text, opts);
-  }
+    // Normaliza texto e prepara chunks
+    const normalized = this.normalizeText(text || '');
+    const max = this.resolveMaxChunkChars(opts?.maxChunkChars);
+    const chunks = this.splitIntoChunks(normalized, max);
 
-  private speakNow(text: string, opts?: { rate?: number; pitch?: number; volume?: number }) {
-    const utter = new SpeechSynthesisUtterance(text);
-    if (this.voice) utter.voice = this.voice;
-    utter.lang = this.voice?.lang || 'pt-BR';
-    // Parâmetros base ajustados pelo estilo, podendo ser sobrescritos por opts
-    utter.rate = opts?.rate ?? this.baseRate;
-    utter.pitch = opts?.pitch ?? this.basePitch;
-    utter.volume = opts?.volume ?? this.baseVolume;
-    window.speechSynthesis.speak(utter);
-  }
+    // Se não há conteúdo, encerra
+    if (chunks.length === 0) return Promise.resolve();
 
-  private flushIfStuck() {
-    try {
-      const synth = window.speechSynthesis;
-      // Alguns browsers ficam "pausados" até chamar resume dentro de um gesto
-      if (synth.paused) synth.resume();
-      // Se está falando muito tempo/pilha suja, cancel antes de nova fala
-      if (synth.speaking && synth.pending) {
-        synth.cancel();
-        synth.resume();
+    // Serializa execução numa chain para garantir ordem
+    const run = async () => {
+      try {
+        this._stopRequested = false; // nova execução
+        await this.ensureReady();
+        const synth = window.speechSynthesis;
+        // Se engine estiver pausado, tenta retomar
+        if (synth.paused) try { synth.resume(); } catch {}
+
+        this._pendingCount += chunks.length;
+        for (const chunk of chunks) {
+          if (this._stopRequested) break;
+          await this.speakChunk(chunk, opts);
+        }
+      } finally {
+        // limpar contadores caso fila zere
       }
+    };
+
+    // Encadeia e retorna promessa concluída quando esta fala terminar
+    this._chain = this._chain.then(() => run()).catch(() => run());
+    return this._chain;
+  }
+
+  /**
+   * Interrompe imediatamente e limpa fila.
+   */
+  public stop(): void {
+    this._stopRequested = true;
+    try {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        try { window.speechSynthesis.resume(); } catch {}
+      }
+    } catch {}
+    this._currentUtterance = null;
+    this._pendingCount = 0;
+    // zera chain para evitar segurar promessas antigas
+    this._chain = Promise.resolve();
+  }
+
+  /**
+   * Informa se há fala em andamento ou pendente.
+   */
+  public isSpeaking(): boolean {
+    try {
+      const synth = (typeof window !== 'undefined' && 'speechSynthesis' in window) ? window.speechSynthesis : null as any;
+      return !!(synth && (synth.speaking || synth.pending)) || this._pendingCount > 0 || !!this._currentUtterance;
     } catch {
-      // ignore
+      return this._pendingCount > 0 || !!this._currentUtterance;
     }
   }
 
-  private flushQueue() {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    if (!this.unlocked || !this.voicesLoaded) return;
-    if (this.queue.length === 0) return;
+  /**
+   * Define a voz a partir do nome (aplica nas próximas falas, não interrompe a atual).
+   */
+  public setVoiceByName(name: string): void {
+    this.setPreferredVoiceName(name);
+  }
 
-    // Garante estado coerente e esvazia fila
-    try {
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.resume();
-    } catch {
-      // ignore
-    }
+  // ===== Helpers de TTS robusto =====
 
-    const items = this.queue.slice();
-    this.queue = [];
-    for (const it of items) {
-      this.speakNow(it.text, it.opts);
+  private resolveMaxChunkChars(custom?: number): number {
+    if (typeof custom === 'number' && custom > 0) return Math.min(400, Math.max(80, custom));
+    const ua = (typeof navigator !== 'undefined' ? (navigator.userAgent || '') : '').toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(ua);
+    const isAndroid = /android/.test(ua);
+    return (isIOS || isAndroid) ? 200 : 240;
+  }
+
+  private normalizeText(text: string): string {
+    return text
+      .replace(/\s+/g, ' ')
+      .replace(/\s*([.!?…:,;])\s*/g, '$1 ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private splitIntoChunks(text: string, max: number): string[] {
+    if (!text) return [];
+    const sentences = this.splitBySentence(text);
+    const out: string[] = [];
+    for (const s of sentences) {
+      if (s.length <= max) { out.push(s); continue; }
+      // tenta quebrar por vírgulas/pausas
+      const pieces = this.splitByLength(s, max);
+      out.push(...pieces);
     }
+    return out;
+  }
+
+  private splitBySentence(text: string): string[] {
+    // separa por . ! ? … mantendo o delimitador
+    const re = /[^.!?…]+[.!?…]?/g;
+    const parts = text.match(re) || [text];
+    return parts.map(p => p.trim()).filter(Boolean);
+  }
+
+  private splitByLength(sentence: string, max: number): string[] {
+    const tokens = sentence.split(/(,|;|:|\s)/g).filter(t => t !== undefined);
+    const chunks: string[] = [];
+    let cur = '';
+    for (const t of tokens) {
+      const next = cur + t;
+      if (next.trim().length > max && cur.trim().length > 0) {
+        chunks.push(cur.trim());
+        cur = t.trimStart();
+      } else {
+        cur = next;
+      }
+    }
+    if (cur.trim().length) chunks.push(cur.trim());
+    // se ainda restaram muito grandes por falta de separadores, quebra forçada
+    const forced: string[] = [];
+    for (const c of chunks) {
+      if (c.length <= max) { forced.push(c); continue; }
+      for (let i = 0; i < c.length; i += max) forced.push(c.slice(i, i + max));
+    }
+    return forced;
+  }
+
+  private async ensureReady(): Promise<void> {
+    await this.waitForVoices();
+    // iOS costuma exigir gesto antes de falar
+    if (!this.unlocked) {
+      // não bloqueia indefinidamente: tentamos falar mesmo sem unlocked em desktops
+      const ua = (typeof navigator !== 'undefined' ? navigator.userAgent || '' : '').toLowerCase();
+      const isiOS = /iphone|ipad|ipod/.test(ua);
+      if (isiOS) {
+        // aguarda um pequeno tempo por um possível gesto
+        await new Promise(res => setTimeout(res, 300));
+      }
+    }
+  }
+
+  private waitForVoices(): Promise<void> {
+    if (this.voicesLoaded && (window.speechSynthesis.getVoices() || []).length > 0) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      let done = false;
+      const finish = () => { if (!done) { done = true; resolve(); } };
+      const tryNow = () => {
+        this.loadVoices();
+        const ok = this.voicesLoaded && (window.speechSynthesis.getVoices() || []).length > 0;
+        if (ok) finish();
+      };
+      const onVoices = () => { tryNow(); };
+      try {
+        window.speechSynthesis.addEventListener?.('voiceschanged', onVoices, { once: true } as any);
+      } catch {}
+      // tentativas com timeout progressivo
+      let attempts = 0;
+      const iv = setInterval(() => {
+        attempts++;
+        tryNow();
+        if (done || attempts > 10) {
+          clearInterval(iv);
+          finish();
+        }
+      }, 150);
+      // tentativa imediata
+      tryNow();
+    });
+  }
+
+  private speakChunk(chunk: string, opts?: { rate?: number; pitch?: number; volume?: number }): Promise<void> {
+    return new Promise<void>((resolve) => {
+      if (this._stopRequested) { this._pendingCount = 0; return resolve(); }
+      const synth = window.speechSynthesis;
+      const utter = new SpeechSynthesisUtterance(chunk);
+      this._currentUtterance = utter;
+      if (this.voice) utter.voice = this.voice;
+      utter.lang = this.voice?.lang || 'pt-BR';
+      utter.rate = opts?.rate ?? this.baseRate;
+      utter.pitch = opts?.pitch ?? this.basePitch;
+      utter.volume = opts?.volume ?? this.baseVolume;
+
+      const cleanup = () => { this._currentUtterance = null; this._pendingCount = Math.max(0, this._pendingCount - 1); };
+      utter.onend = () => { cleanup(); resolve(); };
+      utter.onerror = () => {
+        cleanup();
+        // tenta se recuperar: resume e segue para o próximo chunk
+        try { if (synth.paused) synth.resume(); } catch {}
+        resolve();
+      };
+
+      // Pequeno delay ajuda Safari/iOS
+      setTimeout(() => {
+        try {
+          if (synth.paused) synth.resume();
+          synth.speak(utter);
+        } catch {
+          resolve();
+        }
+      }, 8);
+    });
   }
 
   private setupUserGestureUnlock() {
@@ -223,30 +413,18 @@ export class NarratorService {
         // Fala curta e silenciosa para "acordar" o mecanismo
         const unlockUtter = new SpeechSynthesisUtterance(' ');
         unlockUtter.volume = 0;
-        synth.cancel();
-        synth.resume();
-        synth.speak(unlockUtter);
-      } catch {
-        // ignore
-      }
+        try { synth.resume(); } catch {}
+        try { synth.speak(unlockUtter); } catch {}
+      } catch {}
       this.unlocked = true;
-      // Remove listeners e tenta escoar fila
+      // Remove listeners
       document.removeEventListener('click', handler);
       document.removeEventListener('touchstart', handler);
       document.removeEventListener('keydown', handler);
-      this.flushQueue();
     };
     document.addEventListener('click', handler, { once: true });
     document.addEventListener('touchstart', handler, { once: true });
     document.addEventListener('keydown', handler, { once: true });
-  }
-
-  private tryLoadVoicesLater() {
-    if (this.voicesLoaded) return;
-    // Tenta algumas vezes buscar vozes com um pequeno atraso
-    if (this.loadRetry > 10) return;
-    this.loadRetry++;
-    setTimeout(() => this.loadVoices(), 250);
   }
 
   /**
@@ -267,6 +445,8 @@ export class NarratorService {
       teamNames?: { A?: string; B?: string };
       // totais por jogador (já atualizados) para brincadeiras e topo de pontuação
       playerTotals?: Record<string, number>;
+      // se verdadeiro, inclui o placar no final da fala (por padrão, não inclui para reduzir tamanho da locução)
+      includeScoreAtEnd?: boolean;
     }
   ) {
     // 0) Validação simples – só narra quando há pontos adicionados positivos
@@ -348,7 +528,7 @@ export class NarratorService {
               'É o cara do jogo por enquanto! Que momento!',
             ]
           : [
-              'Segue no topo da artilharia, dividindo a liderança. A rodinha tá quente!',
+              'Segue no topo da artilharia, dividindo a liderança.',
               'Empatado na artilharia do jogo! Briga boa!',
               'Divide a ponta entre os cestinhas!'
             ];
@@ -398,8 +578,10 @@ export class NarratorService {
     const gag = this.buildPlayfulJoke(playerName, totals);
     if (gag) partes.push(gag);
 
-    // 4.6) Fechamento obrigatório com o placar por extenso
-    partes.push(`Placar: ${placar}`);
+    // 4.6) Fechamento com o placar por extenso (opcional para evitar locuções muito longas)
+    if (opts?.includeScoreAtEnd) {
+      partes.push(`Placar: ${placar}`);
+    }
 
     // 5) Fala final – junta as partes respeitando a ordem de narrativa
     this.speak(partes.join(' '));
@@ -450,6 +632,16 @@ export class NarratorService {
 
     // 6) Retorna uma das frases com um espaço final para respirar na fala
     return jokes[Math.floor(Math.random() * jokes.length)] + ' ';
+  }
+
+  /**
+   * Fala o placar atual sob demanda (para botão específico na UI).
+   */
+  speakScore(scoreA: number, scoreB: number, teamNames?: { A?: string; B?: string }) {
+    const teamAName = teamNames?.A?.trim() || 'Time A';
+    const teamBName = teamNames?.B?.trim() || 'Time B';
+    const text = `Placar da partida. ${teamAName}: ${scoreA} ponto${scoreA === 1 ? '' : 's'}, ${teamBName}: ${scoreB} ponto${scoreB === 1 ? '' : 's'}.`;
+    this.speak(text);
   }
 
   announceEnd(winner: 'A' | 'B' | 'Empate', mvpName?: string | null) {

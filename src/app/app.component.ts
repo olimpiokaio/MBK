@@ -27,11 +27,14 @@ export class AppComponent {
     '2OdrsOqZqh8', // Summer Walker - White Tee
     'j5-yKhDd64s', // Eminem - Not Afraid
     'O-zpOMYRi0w', // Hip Hop beat - mix (used previously)
+    'mEqDKq_GkJE', // Baby Bash - Baby, I'm Back ft. Akon
     'XkQ1pltpQnw', // Don Toliver - You (feat. Travis Scott)
     'wdwlRzZ7Slc', // Chris Brown - climax
     'aq-DH4iwviE',  // Matuê - 333
+    '3KL9mRus19o', // Blackstreet - No Diggity
     'yu2WGTZUgBo', // Don Toliver - No Comments,
     'jMjKz922Yh0', // DDG - She Don't Play
+    'cbHkzwa0QmM', // Kendrick Lamar - peekaboo
   ];
 
   // Background YouTube music URL (hidden iframe)

@@ -45,6 +45,9 @@ export class MatchComponent {
 
   private timerRef: any = null;
 
+  // Narrator toggle state (UI)
+  narratorOn = signal<boolean>(this.narrator.isEnabled());
+
   constructor() {
     const id = this.route.snapshot.paramMap.get('id') ?? '';
     this.communityId.set(id);
@@ -178,6 +181,15 @@ export class MatchComponent {
       this.running.set(true);
       this.startTimer();
     }
+  }
+
+  speakCurrentScore() {
+    this.narrator.speakScore(this.scoreA(), this.scoreB());
+  }
+
+  toggleNarrator() {
+    const on = this.narrator.toggleEnabled();
+    this.narratorOn.set(on);
   }
 
   addPoints(team: 'A' | 'B', player: Player, points: number) {

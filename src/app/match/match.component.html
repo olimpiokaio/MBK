@@ -93,6 +93,7 @@
         <div class="timer">
           <span class="time-display">{{ formatTime(timeLeft()) }}</span>
           <button class="pause-btn" type="button" (click)="toggleTimer()">{{ running() ? 'Pausar' : 'Continuar' }}</button>
+          <button class="mute-btn" type="button" (click)="toggleNarrator()">{{ narratorOn() ? 'Mutar Narrador' : 'Ativar Narrador' }}</button>
         </div>
       </header>
 
@@ -105,6 +106,10 @@
           <div class="label">Time B</div>
           <div class="value">{{ scoreB() }}</div>
         </div>
+      </div>
+
+      <div class="score-actions">
+        <button class="speak-score-btn" type="button" (click)="speakCurrentScore()">Falar Placar</button>
       </div>
 
       <div class="players-columns">
