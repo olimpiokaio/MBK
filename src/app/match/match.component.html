@@ -114,7 +114,11 @@
             @for (p of teamA(); track $index) {
               <li class="player-row">
                 <div class="info">
-                  <img class="avatar-sm" [src]="p.playerImage" [alt]="p.playerName" />
+                  <span class="avatar-badge-wrap">
+                    <img class="avatar-sm" [class.fire-border]="isTopScorer(p)" [class.ice-border]="isBottomScorer(p)" [src]="p.playerImage" [alt]="p.playerName" />
+                    @if (isTopScorer(p)) { <span class="icon-badge icon-fire" aria-label="Top scorer">🔥</span> }
+                    @if (isBottomScorer(p)) { <span class="icon-badge icon-ice" aria-label="Lowest scorer">🧊</span> }
+                  </span>
                   <span class="name">{{ p.playerName }}</span>
                   <span class="match-pts">{{ getPlayerMatchPoints(p) }} pts</span>
                 </div>
@@ -133,7 +137,11 @@
             @for (p of teamB(); track $index) {
               <li class="player-row">
                 <div class="info">
-                  <img class="avatar-sm" [src]="p.playerImage" [alt]="p.playerName" />
+                  <span class="avatar-badge-wrap">
+                    <img class="avatar-sm" [class.fire-border]="isTopScorer(p)" [class.ice-border]="isBottomScorer(p)" [src]="p.playerImage" [alt]="p.playerName" />
+                    @if (isTopScorer(p)) { <span class="icon-badge icon-fire" aria-label="Top scorer">🔥</span> }
+                    @if (isBottomScorer(p)) { <span class="icon-badge icon-ice" aria-label="Lowest scorer">🧊</span> }
+                  </span>
                   <span class="name">{{ p.playerName }}</span>
                   <span class="match-pts">{{ getPlayerMatchPoints(p) }} pts</span>
                 </div>
@@ -155,6 +163,47 @@
           } @else {
             <p>Fim de jogo: Time {{ winner() }} venceu!</p>
           }
+        </div>
+        <div class="end-actions">
+          <button class="stats-btn" type="button" (click)="openStats()">Ver Estatísticas</button>
+          <button class="reset-btn" type="button" (click)="resetSelection()">Nova Partida</button>
+        </div>
+      }
+
+      <!-- Modal Estatísticas -->
+      @if (statsOpen()) {
+        <div class="modal-overlay" (click)="closeStats()">
+          <div class="modal-card stats-modal" (click)="$event.stopPropagation()">
+            <h3>Estatísticas da Partida</h3>
+            <ul class="stat-list">
+              <li>
+                <strong>MVP:</strong>
+                @if (mvpPlayer()) { {{ mvpPlayer()!.playerName }} · {{ getPlayerMatchPoints(mvpPlayer()!) }} pts } @else { — }
+              </li>
+              <li>
+                <strong>Maior Pontuador:</strong>
+                @if (topScorerPlayer()) { {{ topScorerPlayer()!.playerName }} · {{ getPlayerMatchPoints(topScorerPlayer()!) }} pts } @else { — }
+              </li>
+            </ul>
+
+            @if (bestPlayer()) {
+              <div class="twoK-card" [attr.data-tier]="computeTier(getPlayerMatchPoints(bestPlayer()!))">
+                <div class="twoK-frame">
+                  <img class="twoK-photo" [src]="bestPlayer()!.playerImage" [alt]="bestPlayer()!.playerName" />
+                  <div class="twoK-info">
+                    <div class="twoK-tier">{{ computeTier(getPlayerMatchPoints(bestPlayer()!)) }}</div>
+                    <div class="twoK-name">{{ bestPlayer()!.playerName }}</div>
+                    <div class="twoK-badges">
+                      <span class="badge">LV {{ bestPlayer()!.level }}</span>
+                      <span class="badge">{{ getPlayerMatchPoints(bestPlayer()!) }} PTS</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <button type="button" class="btn-cancel" (click)="closeStats()">Fechar</button>
+          </div>
         </div>
       }
 

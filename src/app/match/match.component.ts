@@ -37,6 +37,10 @@ export class MatchComponent {
   winner = signal<'A' | 'B' | 'Empate' | null>(null);
   // per-player points keyed by player name
   playerPoints = signal<Map<string, number>>(new Map());
+
+  // Statistics state
+  statsOpen = signal<boolean>(false);
+
   private timerRef: any = null;
 
   constructor() {
@@ -234,6 +238,8 @@ export class MatchComponent {
       else if (this.scoreB() > this.scoreA()) this.winner.set('B');
       else this.winner.set('Empate');
     }
+    // auto-close adjust modal if open
+    this.closeModal();
   }
 
   formatTime(totalSeconds: number): string {
@@ -244,5 +250,69 @@ export class MatchComponent {
 
   getPlayerMatchPoints(p: Player): number {
     return this.playerPoints().get(p.playerName) ?? 0;
+  }
+
+  // Compute current max/min points among all players in the match.
+  // If all players have the same points, we return null for both to avoid showing icons.
+  topBottom = computed<{ max: number | null; min: number | null }>(() => {
+    const map = this.playerPoints();
+    const values = Array.from(map.values());
+    if (values.length === 0) return { max: null, min: null };
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+    if (max === min) return { max: null, min: null };
+    return { max, min };
+  });
+
+  isTopScorer(p: Player): boolean {
+    const tb = this.topBottom();
+    if (tb.max === null) return false;
+    return this.getPlayerMatchPoints(p) === tb.max;
+  }
+
+  isBottomScorer(p: Player): boolean {
+    const tb = this.topBottom();
+    if (tb.min === null) return false;
+    return this.getPlayerMatchPoints(p) === tb.min;
+  }
+
+  // Stats helpers
+  private allPlayersInMatch(): Player[] {
+    return [...this.teamA(), ...this.teamB()];
+  }
+
+  topScorerPlayer = computed<Player | null>(() => {
+    const map = this.playerPoints();
+    if (map.size === 0) return null;
+    let best: Player | null = null;
+    let bestPts = -1;
+    for (const p of this.allPlayersInMatch()) {
+      const pts = map.get(p.playerName) ?? 0;
+      if (pts > bestPts) { best = p; bestPts = pts; }
+      else if (pts === bestPts && best) {
+        // tie-breaker: higher level, then higher totalPoints, then lexicographic name
+        if (p.level > best.level) best = p;
+        else if (p.level === best.level && p.totalPoints > best.totalPoints) best = p;
+        else if (p.level === best.level && p.totalPoints === best.totalPoints && p.playerName.localeCompare(best.playerName) < 0) best = p;
+      }
+    }
+    return best;
+  });
+
+  mvpPlayer = computed<Player | null>(() => {
+    // For now, MVP == top scorer with same tie-breakers.
+    return this.topScorerPlayer();
+  });
+
+  bestPlayer = computed<Player | null>(() => this.mvpPlayer());
+
+  openStats() { if (this.winner() !== null) this.statsOpen.set(true); }
+  closeStats() { this.statsOpen.set(false); }
+
+  computeTier(points: number): 'bronze' | 'silver' | 'gold' | 'diamond' {
+    if (points >= 12) return 'diamond';
+    if (points >= 9) return 'gold';
+    if (points >= 6) return 'silver';
+    return 'bronze';
   }
 }
