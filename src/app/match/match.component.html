@@ -1,1 +1,32 @@
-<p>match works!</p>
+<section class="content-match">
+  <div class="top-bar">
+    <app-back-button [back]="true" ariaLabel="Voltar" label="← VOLTAR" />
+  </div>
+
+  <header class="match-header">
+    <h2 class="match-title">Match • {{ communityName() || ('Comunidade #' + communityId()) }}</h2>
+    <p class="match-sub">Players da comunidade · <span class="badge-count">{{ players().length }}</span></p>
+  </header>
+
+  <div class="players-grid">
+    @if (players().length === 0) {
+      <p class="empty">Nenhum jogador encontrado para esta comunidade.</p>
+    } @else {
+      @for (p of players(); track $index) {
+        <article class="player-card" tabindex="0">
+          <div class="avatar-wrap">
+            <img class="avatar" [src]="p.playerImage" [alt]="p.playerName" loading="lazy" />
+            <span class="lvl-chip" title="Nível">LV {{ p.level }}</span>
+          </div>
+          <div class="player-info">
+            <h3 class="player-name">{{ p.playerName }}</h3>
+            <ul class="stats">
+              <li><span class="stat-label">Idade</span><span class="stat-value">{{ p.age }}</span></li>
+              <li><span class="stat-label">Pontos</span><span class="stat-value">{{ p.totalPoints }}</span></li>
+            </ul>
+          </div>
+        </article>
+      }
+    }
+  </div>
+</section>

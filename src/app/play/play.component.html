@@ -7,7 +7,7 @@
   </div>
   <div class="list-communities">
     @for (communit of comunitys; track $index) {
-      <app-card-communit [community]="communit" (click)="onSelected(communit.id)"></app-card-communit>
+      <app-card-communit [community]="communit" (click)="onSelected(communit)"></app-card-communit>
     }
   </div>
 </section>

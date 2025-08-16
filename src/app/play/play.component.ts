@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { CardCommunitComponent } from '../shared/card-communit/card-communit.component';
 import { Communitiy } from '../community/community.model';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
@@ -7,11 +7,12 @@ import { BackButtonComponent } from '../shared/back-button/back-button.component
 @Component({
   selector: 'app-play',
   standalone: true,
-  imports: [CardCommunitComponent, RouterLink, BackButtonComponent],
+  imports: [CardCommunitComponent, BackButtonComponent],
   templateUrl: './play.component.html',
   styleUrl: './play.component.css',
 })
 export class PlayComponent {
+  private router = inject(Router);
 
   comunitys: Communitiy[] = [
     new Communitiy(
@@ -43,7 +44,7 @@ export class PlayComponent {
     ),
   ];
 
-  onSelected(id: string) {
-    console.log('selected: ' + id);
+  onSelected(communit: Communitiy) {
+    this.router.navigate(['/match', communit.id], { state: { name: communit.name } });
   }
 }
