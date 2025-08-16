@@ -141,3 +141,29 @@
   text-shadow: 0 0 7px #6d3dff;
   animation: stat-glow 2s infinite alternate;
 }
+
+/* Mobile responsiveness for the card */
+@media (max-width: 600px) {
+  .cosmic-card {
+    height: 360px;
+    border-radius: 18px;
+  }
+  .player-holo {
+    width: 80%;
+    height: 58%;
+    left: 10%;
+    top: 14%;
+    border-radius: 12px;
+  }
+  .cosmic-stats {
+    bottom: 14px;
+    gap: 8px;
+    padding: 0 12px;
+  }
+  .cosmic-stat {
+    padding: 8px;
+  }
+  .stat-value {
+    font-size: 1.4em;
+  }
+}

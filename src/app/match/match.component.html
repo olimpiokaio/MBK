@@ -119,9 +119,9 @@
                   <span class="match-pts">{{ getPlayerMatchPoints(p) }} pts</span>
                 </div>
                 <div class="actions">
-                  <button type="button" (click)="addPoints('A', p, 1)" [disabled]="winner() !== null">+1</button>
-                  <button type="button" (click)="addPoints('A', p, 2)" [disabled]="winner() !== null">+2</button>
-                  <button type="button" (click)="addPoints('A', p, 3)" [disabled]="winner() !== null">+3</button>
+                  <button type="button" (click)="openAdjustPoints('A', p, 1)" [disabled]="winner() !== null">+1</button>
+                  <button type="button" (click)="openAdjustPoints('A', p, 2)" [disabled]="winner() !== null">+2</button>
+                  <button type="button" (click)="openAdjustPoints('A', p, 3)" [disabled]="winner() !== null">+3</button>
                 </div>
               </li>
             }
@@ -138,9 +138,9 @@
                   <span class="match-pts">{{ getPlayerMatchPoints(p) }} pts</span>
                 </div>
                 <div class="actions">
-                  <button type="button" (click)="addPoints('B', p, 1)" [disabled]="winner() !== null">+1</button>
-                  <button type="button" (click)="addPoints('B', p, 2)" [disabled]="winner() !== null">+2</button>
-                  <button type="button" (click)="addPoints('B', p, 3)" [disabled]="winner() !== null">+3</button>
+                  <button type="button" (click)="openAdjustPoints('B', p, 1)" [disabled]="winner() !== null">+1</button>
+                  <button type="button" (click)="openAdjustPoints('B', p, 2)" [disabled]="winner() !== null">+2</button>
+                  <button type="button" (click)="openAdjustPoints('B', p, 3)" [disabled]="winner() !== null">+3</button>
                 </div>
               </li>
             }
@@ -155,6 +155,27 @@
           } @else {
             <p>Fim de jogo: Time {{ winner() }} venceu!</p>
           }
+        </div>
+      }
+
+      <!-- Modal para somar/diminuir pontos -->
+      @if (modalOpen()) {
+        <div class="modal-overlay" (click)="closeModal()">
+          <div class="modal-card" (click)="$event.stopPropagation()">
+            <h3>Ajustar Pontos</h3>
+            @if (pendingAction()) {
+              <p>
+                Time {{ pendingAction()!.team }} •
+                {{ pendingAction()!.player.playerName }}<br />
+                Pontuação selecionada: <strong>{{ pendingAction()!.points }}</strong>
+              </p>
+            }
+            <div class="modal-actions">
+              <button type="button" class="btn-sub" (click)="confirmAdjust('sub')">Diminuir</button>
+              <button type="button" class="btn-sum" (click)="confirmAdjust('sum')">Somar</button>
+            </div>
+            <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+          </div>
         </div>
       }
     </section>

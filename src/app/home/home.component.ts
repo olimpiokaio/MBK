@@ -12,9 +12,9 @@ import { Player } from '../shared/types/player.model';
 })
 export class HomeComponent {
   player = new Player(
-    'Jayson Tatum',
-    'https://lncimg.lance.com.br/uploads/2024/07/Jayson-Tatum-2-scaled-aspect-ratio-512-320-1.jpg',
-    32,
+    'Kaio Silva',
+    'kaioba.jpeg',
+    30,
     50,
     2503
   );

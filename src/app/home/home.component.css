@@ -4,6 +4,7 @@
 }
 
 .container-play-legacy {
+  position: relative;
   margin-top: 0.4rem;
   padding: 2rem 0;
   border-radius: 1.4rem;
@@ -93,6 +94,7 @@
 
 
 .comunit {
+  position: relative;
   cursor: pointer;
   margin: auto;
   margin-top: 0.4rem;
@@ -103,7 +105,8 @@
   height: 5rem;
   background-color: #d10050;
   will-change: transform, filter;
-}.comunit::before {
+}
+.comunit::before {
   content: "";
   position: absolute;
   top: 0%;
@@ -114,4 +117,32 @@
   background: radial-gradient(circle, rgba(240, 240, 240, 0.363) 20%, transparent 21%);
   background-size: 5px 5px;
   z-index: -1;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .container-home {
+    margin-top: 0;
+    padding: 0 0.5rem 1rem;
+  }
+  .home-play h1,
+  .home-legacy h1,
+  .home-store h1,
+  .comunit h1 {
+    font-size: 1.4rem;
+    margin: 0.2rem 0;
+  }
+  .container-play-legacy {
+    padding: 1rem 0.5rem;
+    border-radius: 1rem;
+  }
+  .home-legacy {
+    height: 8rem;
+    padding: 0.6rem 0.2rem;
+  }
+  .home-store,
+  .comunit,
+  .home-match {
+    height: 4rem;
+  }
 }

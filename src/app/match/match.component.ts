@@ -176,22 +176,51 @@ export class MatchComponent {
 
   addPoints(team: 'A' | 'B', player: Player, points: number) {
     if (!this.gameStarted() || this.winner()) return;
-    // update player points
+    // update player points with clamping and compute actual delta applied
     const map = new Map(this.playerPoints());
     const current = map.get(player.playerName) ?? 0;
-    map.set(player.playerName, current + points);
+    let target = current + points;
+    if (target < 0) target = 0;
+    const delta = target - current;
+    if (delta === 0) return;
+    map.set(player.playerName, target);
     this.playerPoints.set(map);
 
-    // update team score
+    // update team score with the same delta and clamp to 0
     if (team === 'A') {
-      const s = this.scoreA() + points;
+      let s = this.scoreA() + delta;
+      if (s < 0) s = 0;
       this.scoreA.set(s);
-      if (s >= 14) this.finishGame('A');
+      if (delta > 0 && s >= 14) this.finishGame('A');
     } else {
-      const s = this.scoreB() + points;
+      let s = this.scoreB() + delta;
+      if (s < 0) s = 0;
       this.scoreB.set(s);
-      if (s >= 14) this.finishGame('B');
+      if (delta > 0 && s >= 14) this.finishGame('B');
     }
+  }
+
+  // Modal logic for choosing to add or subtract points
+  modalOpen = signal<boolean>(false);
+  pendingAction = signal<{ team: 'A' | 'B'; player: Player; points: number } | null>(null);
+
+  openAdjustPoints(team: 'A' | 'B', player: Player, points: number) {
+    if (!this.gameStarted() || this.winner()) return;
+    this.pendingAction.set({ team, player, points });
+    this.modalOpen.set(true);
+  }
+
+  confirmAdjust(type: 'sum' | 'sub') {
+    const action = this.pendingAction();
+    if (!action) return;
+    const pts = type === 'sum' ? action.points : -action.points;
+    this.addPoints(action.team, action.player, pts);
+    this.closeModal();
+  }
+
+  closeModal() {
+    this.modalOpen.set(false);
+    this.pendingAction.set(null);
   }
 
   private finishGame(winnerTeam?: 'A' | 'B') {
