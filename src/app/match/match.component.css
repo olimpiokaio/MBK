@@ -566,3 +566,26 @@
 @media (min-width: 861px) and (max-width: 1120px) {
   .players-columns { gap: 0.8rem; }
 }
+
+
+/* Loader styles for players loading */
+.loader-wrap {
+  display: grid;
+  place-items: center;
+  gap: 0.6rem;
+  padding: 2rem 0;
+}
+.spin-ball {
+  width: 64px;
+  height: 64px;
+  animation: spin 1s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(255, 196, 0, 0.4));
+}
+.loader-text {
+  color: #cfd3ff;
+  font-size: 0.95rem;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -28,31 +28,35 @@
 
     <!-- Players list for current selection -->
     @if (!allSelected()) {
-      <div class="players-grid">
-        @if (players().length === 0) {
-          <p class="empty">Nenhum jogador encontrado para esta comunidade.</p>
-        } @else {
-          @for (p of players(); track $index) {
-            <article class="player-card"
-                     [class.selected]="isSelectedForCurrent(p)"
-                     [class.disabled]="!canSelect(p) && !isSelectedForCurrent(p)"
-                     (click)="togglePlayer(p)"
-                     tabindex="0">
-              <div class="avatar-wrap">
-                <img class="avatar" [src]="p.playerImage" [alt]="p.playerName" loading="lazy" />
-                <span class="lvl-chip" title="Nível">LV {{ p.level }}</span>
-              </div>
-              <div class="player-info">
-                <h3 class="player-name">{{ p.playerName }}</h3>
-                <ul class="stats">
-                  <li><span class="stat-label">Idade</span><span class="stat-value">{{ p.age }}</span></li>
-                  <li><span class="stat-label">Pontos</span><span class="stat-value">{{ p.totalPoints }}</span></li>
-                </ul>
-              </div>
-            </article>
+      @if (loadingPlayers()) {
+        <app-loading-spinner text="Carregando jogadores…" />
+      } @else {
+        <div class="players-grid">
+          @if (players().length === 0) {
+            <p class="empty">Nenhum jogador encontrado para esta comunidade.</p>
+          } @else {
+            @for (p of players(); track $index) {
+              <article class="player-card"
+                       [class.selected]="isSelectedForCurrent(p)"
+                       [class.disabled]="!canSelect(p) && !isSelectedForCurrent(p)"
+                       (click)="togglePlayer(p)"
+                       tabindex="0">
+                <div class="avatar-wrap">
+                  <img class="avatar" [src]="p.playerImage" [alt]="p.playerName" loading="lazy" />
+                  <span class="lvl-chip" title="Nível">LV {{ p.level }}</span>
+                </div>
+                <div class="player-info">
+                  <h3 class="player-name">{{ p.playerName }}</h3>
+                  <ul class="stats">
+                    <li><span class="stat-label">Idade</span><span class="stat-value">{{ p.age }}</span></li>
+                    <li><span class="stat-label">Pontos</span><span class="stat-value">{{ p.totalPoints }}</span></li>
+                  </ul>
+                </div>
+              </article>
+            }
           }
-        }
-      </div>
+        </div>
+      }
     }
 
     <!-- Summary when both teams are complete -->

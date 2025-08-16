@@ -6,11 +6,12 @@ import { BackButtonComponent } from '../shared/back-button/back-button.component
 import { NarratorService } from '../services/narrator.service';
 import { TeamPlayersColumnComponent } from '../shared/team-players-column/team-players-column.component';
 import { CardQualificacaoComponent } from '../shared/card-qualificacao/card-qualificacao.component';
+import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-match',
   standalone: true,
-  imports: [BackButtonComponent, TeamPlayersColumnComponent, CardQualificacaoComponent],
+  imports: [BackButtonComponent, TeamPlayersColumnComponent, CardQualificacaoComponent, LoadingSpinnerComponent],
   templateUrl: './match.component.html',
   styleUrl: './match.component.css'
 })
@@ -18,6 +19,9 @@ export class MatchComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   private playersService = inject(PlayersService);
   private narrator = inject(NarratorService);
+
+  // Loading state
+  loadingPlayers = signal<boolean>(true);
 
   communityId = signal<string>('');
   communityName = signal<string>('');
@@ -63,8 +67,15 @@ export class MatchComponent implements OnDestroy {
     this.communityName.set(state?.name ?? '');
 
     // Simula chamada HTTP para obter jogadores por comunidade
-    this.playersService.getPlayersByCommunity(id).subscribe(list => {
-      this.players.set(list);
+    this.playersService.getPlayersByCommunity(id).subscribe({
+      next: (list) => {
+        this.players.set(list);
+        this.loadingPlayers.set(false);
+      },
+      error: () => {
+        // Even on error, stop loading to allow UI to show empty/error state
+        this.loadingPlayers.set(false);
+      }
     });
   }
 
