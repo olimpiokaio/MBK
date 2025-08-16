@@ -15,6 +15,12 @@
   margin: 0.5rem 0 1rem;
 }
 
+.top-bar {
+  text-align: right;
+  padding: 0 0 1.8rem 0;
+  border-bottom: #ffc400 2px solid;
+}
+
 .match-title {
   margin: 0;
   font-size: 1.6rem;
@@ -95,12 +101,12 @@
   right: -6px;
   bottom: -6px;
   font-size: 0.7rem;
-  background: linear-gradient(135deg, var(--violet-600), var(--magenta-600));
+  background: linear-gradient(135deg, #6D3DFFFF, #D10050FF);
   color: white;
   padding: 0.2rem 0.45rem;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.7);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.77);
 }
 
 .player-info {
