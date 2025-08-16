@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MatchService } from './match.service';
 import { Player } from '../shared/types/player.model';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
+import { NarratorService } from '../services/narrator.service';
 
 @Component({
   selector: 'app-match',
@@ -14,6 +15,7 @@ import { BackButtonComponent } from '../shared/back-button/back-button.component
 export class MatchComponent {
   private route = inject(ActivatedRoute);
   private matchService = inject(MatchService);
+  private narrator = inject(NarratorService);
 
   communityId = signal<string>('');
   communityName = signal<string>('');
@@ -191,16 +193,25 @@ export class MatchComponent {
     this.playerPoints.set(map);
 
     // update team score with the same delta and clamp to 0
+    let newScoreA = this.scoreA();
+    let newScoreB = this.scoreB();
     if (team === 'A') {
       let s = this.scoreA() + delta;
       if (s < 0) s = 0;
       this.scoreA.set(s);
+      newScoreA = s;
       if (delta > 0 && s >= 14) this.finishGame('A');
     } else {
       let s = this.scoreB() + delta;
       if (s < 0) s = 0;
       this.scoreB.set(s);
+      newScoreB = s;
       if (delta > 0 && s >= 14) this.finishGame('B');
+    }
+
+    // Announce only when points were added (not subtracted)
+    if (delta > 0) {
+      this.narrator.announceScore(player.playerName, delta, newScoreA, newScoreB);
     }
   }
 
@@ -240,6 +251,13 @@ export class MatchComponent {
     }
     // auto-close adjust modal if open
     this.closeModal();
+
+    // Narrate end of game with winner and MVP
+    const w = this.winner();
+    const mvpName = this.mvpPlayer()?.playerName ?? null;
+    if (w !== null) {
+      this.narrator.announceEnd(w, mvpName);
+    }
   }
 
   formatTime(totalSeconds: number): string {
