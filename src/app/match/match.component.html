@@ -90,11 +90,13 @@
     <section class="game-screen">
       <header class="game-header">
         <h2 class="game-title">Arena Match • {{ communityName() || ('Comunidade #' + communityId()) }}</h2>
-        <div class="timer">
-          <button class="mute-btn pause-btn" type="button" (click)="toggleNarrator()">{{ narratorOn() ? 'Mutar Narrador' : 'Ativar Narrador' }}</button>
-          <button class="speak-score-btn pause-btn" type="button" (click)="speakCurrentScore()">Falar Placar</button>
-          <button class="pause-btn" type="button" (click)="toggleTimer()">{{ running() ? 'Pausar' : 'Continuar' }}</button>
-        </div>
+        @if (winner() === null) {
+          <div class="timer">
+            <button class="mute-btn pause-btn" type="button" (click)="toggleNarrator()">{{ narratorOn() ? 'Mutar Narrador' : 'Ativar Narrador' }}</button>
+            <button class="speak-score-btn pause-btn" type="button" (click)="speakCurrentScore()">Falar Placar</button>
+            <button class="pause-btn" type="button" (click)="toggleTimer()">{{ running() ? 'Pausar' : 'Continuar' }}</button>
+          </div>
+        }
       </header>
 
       <!-- Jumbotron NBA-style scoreboard -->
