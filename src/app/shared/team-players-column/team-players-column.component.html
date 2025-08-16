@@ -1,0 +1,23 @@
+<div class="team-column" [class.team-a-col]="teamId === 'A'" [class.team-b-col]="teamId === 'B'">
+  <h3>{{ title }}</h3>
+  <ul>
+    @for (p of players; track $index) {
+      <li class="player-row">
+        <div class="info">
+          <span class="avatar-badge-wrap">
+            <img class="avatar-sm" [class.fire-border]="isTop(p)" [class.ice-border]="isBottom(p)" [src]="p.playerImage" [alt]="p.playerName" />
+            @if (isTop(p)) { <span class="icon-badge icon-fire" aria-label="Top scorer">🔥</span> }
+            @if (isBottom(p)) { <span class="icon-badge icon-ice" aria-label="Lowest scorer">🧊</span> }
+          </span>
+          <span class="name">{{ p.playerName }}</span>
+          <span class="match-pts">{{ getPoints(p) }} pts</span>
+        </div>
+        <div class="actions">
+          <button type="button" (click)="onAdjust(p, 1)" [disabled]="disabled">P1</button>
+          <button type="button" (click)="onAdjust(p, 2)" [disabled]="disabled">P2</button>
+          <button type="button" (click)="onAdjust(p, 3)" [disabled]="disabled">P3</button>
+        </div>
+      </li>
+    }
+  </ul>
+</div>

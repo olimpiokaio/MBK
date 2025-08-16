@@ -4,11 +4,12 @@ import { MatchService } from './match.service';
 import { Player } from '../shared/types/player.model';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
 import { NarratorService } from '../services/narrator.service';
+import { TeamPlayersColumnComponent } from '../shared/team-players-column/team-players-column.component';
 
 @Component({
   selector: 'app-match',
   standalone: true,
-  imports: [BackButtonComponent],
+  imports: [BackButtonComponent, TeamPlayersColumnComponent],
   templateUrl: './match.component.html',
   styleUrl: './match.component.css'
 })
@@ -346,6 +347,29 @@ export class MatchComponent {
 
   bestPlayer = computed<Player | null>(() => this.mvpPlayer());
 
+  // Helper maps/sets for UI components
+  playerPointsRecord = computed<Record<string, number>>(() => Object.fromEntries(this.playerPoints()));
+
+  topNamesSet = computed<Set<string>>(() => {
+    const tb = this.topBottom();
+    if (tb.max === null) return new Set<string>();
+    const set = new Set<string>();
+    for (const [name, pts] of this.playerPoints()) {
+      if (pts === tb.max) set.add(name);
+    }
+    return set;
+  });
+
+  bottomNamesSet = computed<Set<string>>(() => {
+    const tb = this.topBottom();
+    if (tb.min === null) return new Set<string>();
+    const set = new Set<string>();
+    for (const [name, pts] of this.playerPoints()) {
+      if (pts === tb.min) set.add(name);
+    }
+    return set;
+  });
+
   openStats() { if (this.winner() !== null) this.statsOpen.set(true); }
   closeStats() { this.statsOpen.set(false); }
 
@@ -355,4 +379,4 @@ export class MatchComponent {
     if (points >= 6) return 'silver';
     return 'bronze';
   }
-}
+  }

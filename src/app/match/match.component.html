@@ -110,52 +110,26 @@
       </div>
 
       <div class="players-columns">
-        <div class="team-column team-a-col">
-          <h3>Jogadores A</h3>
-          <ul>
-            @for (p of teamA(); track $index) {
-              <li class="player-row">
-                <div class="info">
-                  <span class="avatar-badge-wrap">
-                    <img class="avatar-sm" [class.fire-border]="isTopScorer(p)" [class.ice-border]="isBottomScorer(p)" [src]="p.playerImage" [alt]="p.playerName" />
-                    @if (isTopScorer(p)) { <span class="icon-badge icon-fire" aria-label="Top scorer">🔥</span> }
-                    @if (isBottomScorer(p)) { <span class="icon-badge icon-ice" aria-label="Lowest scorer">🧊</span> }
-                  </span>
-                  <span class="name">{{ p.playerName }}</span>
-                  <span class="match-pts">{{ getPlayerMatchPoints(p) }} pts</span>
-                </div>
-                <div class="actions">
-                  <button type="button" (click)="openAdjustPoints('A', p, 1)" [disabled]="winner() !== null">P1</button>
-                  <button type="button" (click)="openAdjustPoints('A', p, 2)" [disabled]="winner() !== null">P2</button>
-                  <button type="button" (click)="openAdjustPoints('A', p, 3)" [disabled]="winner() !== null">P3</button>
-                </div>
-              </li>
-            }
-          </ul>
-        </div>
-        <div class="team-column team-b-col">
-          <h3>Jogadores B</h3>
-          <ul>
-            @for (p of teamB(); track $index) {
-              <li class="player-row">
-                <div class="info">
-                  <span class="avatar-badge-wrap">
-                    <img class="avatar-sm" [class.fire-border]="isTopScorer(p)" [class.ice-border]="isBottomScorer(p)" [src]="p.playerImage" [alt]="p.playerName" />
-                    @if (isTopScorer(p)) { <span class="icon-badge icon-fire" aria-label="Top scorer">🔥</span> }
-                    @if (isBottomScorer(p)) { <span class="icon-badge icon-ice" aria-label="Lowest scorer">🧊</span> }
-                  </span>
-                  <span class="name">{{ p.playerName }}</span>
-                  <span class="match-pts">{{ getPlayerMatchPoints(p) }} pts</span>
-                </div>
-                <div class="actions">
-                  <button type="button" (click)="openAdjustPoints('B', p, 1)" [disabled]="winner() !== null">P1</button>
-                  <button type="button" (click)="openAdjustPoints('B', p, 2)" [disabled]="winner() !== null">P2</button>
-                  <button type="button" (click)="openAdjustPoints('B', p, 3)" [disabled]="winner() !== null">P3</button>
-                </div>
-              </li>
-            }
-          </ul>
-        </div>
+        <app-team-players-column
+          title="Jogadores A"
+          [teamId]="'A'"
+          [players]="teamA()"
+          [points]="playerPointsRecord()"
+          [topNames]="topNamesSet()"
+          [bottomNames]="bottomNamesSet()"
+          [disabled]="winner() !== null"
+          (adjust)="openAdjustPoints($event.team, $event.player, $event.points)"
+        />
+        <app-team-players-column
+          title="Jogadores B"
+          [teamId]="'B'"
+          [players]="teamB()"
+          [points]="playerPointsRecord()"
+          [topNames]="topNamesSet()"
+          [bottomNames]="bottomNamesSet()"
+          [disabled]="winner() !== null"
+          (adjust)="openAdjustPoints($event.team, $event.player, $event.points)"
+        />
       </div>
 
       @if (winner() !== null) {

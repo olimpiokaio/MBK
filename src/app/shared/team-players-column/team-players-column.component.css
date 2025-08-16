@@ -1,0 +1,46 @@
+.team-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.team-column h3 {
+  margin: 0 0 8px 0;
+}
+.player-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.avatar-badge-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.avatar-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid transparent;
+}
+.fire-border { border-color: #ff7300; }
+.ice-border { border-color: #00c2ff; }
+.icon-badge {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  font-size: 14px;
+}
+.name { font-weight: 600; }
+.match-pts { opacity: 0.8; }
+.actions {
+  display: flex;
+  gap: 6px;
+}
