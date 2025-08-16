@@ -28,6 +28,17 @@ export class MatchComponent {
   maxPerTeam = 3;
   allSelected = computed(() => this.teamA().length === this.maxPerTeam && this.teamB().length === this.maxPerTeam);
 
+  // Game state
+  gameStarted = signal<boolean>(false);
+  running = signal<boolean>(false);
+  timeLeft = signal<number>(600); // 10 minutes in seconds
+  scoreA = signal<number>(0);
+  scoreB = signal<number>(0);
+  winner = signal<'A' | 'B' | 'Empate' | null>(null);
+  // per-player points keyed by player name
+  playerPoints = signal<Map<string, number>>(new Map());
+  private timerRef: any = null;
+
   constructor() {
     const id = this.route.snapshot.paramMap.get('id') ?? '';
     this.communityId.set(id);
@@ -102,5 +113,107 @@ export class MatchComponent {
     this.teamA.set([]);
     this.teamB.set([]);
     this.selectedTeam.set(null);
+    // also reset game state
+    this.stopTimer();
+    this.gameStarted.set(false);
+    this.running.set(false);
+    this.timeLeft.set(600);
+    this.scoreA.set(0);
+    this.scoreB.set(0);
+    this.winner.set(null);
+    this.playerPoints.set(new Map());
+  }
+
+  // GAME LOGIC
+  startGame() {
+    // initialize player points map
+    const map = new Map<string, number>();
+    [...this.teamA(), ...this.teamB()].forEach(p => map.set(p.playerName, 0));
+    this.playerPoints.set(map);
+
+    // reset scores and timer
+    this.scoreA.set(0);
+    this.scoreB.set(0);
+    this.timeLeft.set(600);
+    this.winner.set(null);
+
+    this.gameStarted.set(true);
+    this.running.set(true);
+    this.startTimer();
+  }
+
+  private startTimer() {
+    this.stopTimer();
+    this.timerRef = setInterval(() => {
+      const left = this.timeLeft() - 1;
+      if (left <= 0) {
+        this.timeLeft.set(0);
+        this.finishGame();
+      } else {
+        this.timeLeft.set(left);
+      }
+    }, 1000);
+  }
+
+  private stopTimer() {
+    if (this.timerRef) {
+      clearInterval(this.timerRef);
+      this.timerRef = null;
+    }
+  }
+
+  toggleTimer() {
+    if (!this.gameStarted()) return;
+    if (this.running()) {
+      this.stopTimer();
+      this.running.set(false);
+    } else {
+      if (this.winner()) return; // don't resume if finished
+      this.running.set(true);
+      this.startTimer();
+    }
+  }
+
+  addPoints(team: 'A' | 'B', player: Player, points: number) {
+    if (!this.gameStarted() || this.winner()) return;
+    // update player points
+    const map = new Map(this.playerPoints());
+    const current = map.get(player.playerName) ?? 0;
+    map.set(player.playerName, current + points);
+    this.playerPoints.set(map);
+
+    // update team score
+    if (team === 'A') {
+      const s = this.scoreA() + points;
+      this.scoreA.set(s);
+      if (s >= 14) this.finishGame('A');
+    } else {
+      const s = this.scoreB() + points;
+      this.scoreB.set(s);
+      if (s >= 14) this.finishGame('B');
+    }
+  }
+
+  private finishGame(winnerTeam?: 'A' | 'B') {
+    this.stopTimer();
+    this.running.set(false);
+    if (winnerTeam) {
+      this.winner.set(winnerTeam);
+    } else {
+      // decide by score
+      if (this.scoreA() > this.scoreB()) this.winner.set('A');
+      else if (this.scoreB() > this.scoreA()) this.winner.set('B');
+      else this.winner.set('Empate');
+    }
+  }
+
+  formatTime(totalSeconds: number): string {
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
+
+  getPlayerMatchPoints(p: Player): number {
+    return this.playerPoints().get(p.playerName) ?? 0;
   }
 }
