@@ -41,6 +41,12 @@ export class MatchComponent {
   // per-player points keyed by player name
   playerPoints = signal<Map<string, number>>(new Map());
 
+  // UI effects state
+  lastScoredTeam = signal<'A' | 'B' | null>(null);
+  scoreboardPulse = signal<boolean>(false);
+  confettiSide = signal<'A' | 'B' | null>(null);
+  mobileTab = signal<'A' | 'B'>('A');
+
   // Statistics state
   statsOpen = signal<boolean>(false);
 
@@ -147,6 +153,11 @@ export class MatchComponent {
     this.timeLeft.set(600);
     this.winner.set(null);
 
+    // reset effects
+    this.lastScoredTeam.set(null);
+    this.scoreboardPulse.set(false);
+    this.confettiSide.set(null);
+
     this.gameStarted.set(true);
     this.running.set(true);
     this.startTimer();
@@ -224,6 +235,13 @@ export class MatchComponent {
 
     // Announce only when points were added (not subtracted)
     if (delta > 0) {
+      // trigger UI pulse and confetti
+      this.lastScoredTeam.set(team);
+      this.scoreboardPulse.set(true);
+      this.confettiSide.set(team);
+      setTimeout(() => { this.scoreboardPulse.set(false); }, 420);
+      setTimeout(() => { this.confettiSide.set(null); }, 900);
+
       const totalsObj: Record<string, number> = Object.fromEntries(this.playerPoints());
       this.narrator.announceScore(
         player.playerName,

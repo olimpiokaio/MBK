@@ -402,3 +402,131 @@
 .twoK-card[data-tier="silver"] .twoK-frame { border-color: #c0c0c0; box-shadow: 0 12px 28px rgba(0,0,0,0.55), 0 0 18px rgba(192,192,192,0.25) inset; }
 .twoK-card[data-tier="gold"] .twoK-frame { border-color: #ffd700; box-shadow: 0 12px 28px rgba(0,0,0,0.55), 0 0 18px rgba(255,215,0,0.25) inset; }
 .twoK-card[data-tier="diamond"] .twoK-frame { border-color: #6bd8ff; box-shadow: 0 12px 28px rgba(0,0,0,0.55), 0 0 20px rgba(107,216,255,0.35) inset; }
+
+/* --- NBA Arena Redesign: Tokens --- */
+:root {
+  --ui-bg-dark: #0c0e16;
+  --ui-bg-panel: rgba(16, 18, 30, 0.6);
+  --glass: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --team-a: #2dd36f;
+  --team-b: #6d3dff;
+  --ball-orange: #d86e2a;
+  --arena-glow: 0 10px 28px rgba(0,0,0,0.6);
+}
+
+/* Arena court background with subtle wood + lines + vignette */
+.game-screen {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  background: radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,0.04), rgba(0,0,0,0.2)), var(--ui-bg-dark);
+}
+.game-screen::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    /* court lines (half-court) */
+    radial-gradient(closest-side, rgba(255,255,255,0.18), rgba(255,255,255,0) 75%) 50% 50%/60% 60% no-repeat,
+    linear-gradient(0deg, rgba(255,255,255,0.15), rgba(255,255,255,0.15)) 50% 50%/2px 100% no-repeat,
+    linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.12)) 50% 50%/100% 2px no-repeat,
+    /* wood texture via subtle stripes */
+    repeating-linear-gradient(90deg, rgba(255, 199, 142, 0.08) 0 6px, rgba(176, 120, 67, 0.08) 6px 12px),
+    linear-gradient(180deg, rgba(255,185,124,0.06), rgba(112,79,42,0.06));
+  opacity: 0.18;
+  pointer-events: none;
+}
+.game-screen::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(120% 100% at 50% 0%, rgba(0,0,0,0), rgba(0,0,0,0.35)), radial-gradient(100% 120% at 50% 120%, rgba(0,0,0,0.55), rgba(0,0,0,0.0));
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* Jumbotron central scoreboard */
+.jumbotron {
+  position: relative;
+  margin: 1rem auto 1.2rem;
+  width: min(1100px, 96%);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--arena-glow), inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+.jumbotron::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(45deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
+  pointer-events: none;
+}
+.jumbotron::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: url('../../../public/quadra-icon.png') center/220px auto no-repeat;
+  opacity: 0.10; /* show image lightly to keep scoreboard contrast */
+  filter: saturate(80%) brightness(120%);
+  pointer-events: none;
+}
+.team-panel { display: grid; gap: 0.2rem; justify-items: center; }
+.team-panel .team-name { display: grid; gap: 4px; align-items: center; justify-items: center; }
+.team-panel .team-name .name { font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+.team-panel .team-score { font-size: clamp(3rem, 8vw, 6rem); font-weight: 900; line-height: 1; text-shadow: 0 3px 18px rgba(0,0,0,0.6); }
+.team-panel.left .team-score { color: var(--team-a); }
+.team-panel.right .team-score { color: var(--team-b); }
+.color-bar { display: inline-block; height: 6px; width: 56px; border-radius: 99px; box-shadow: 0 2px 8px rgba(0,0,0,0.4) inset; }
+.color-bar.a { background: linear-gradient(90deg, #24c461, #2dd36f); }
+.color-bar.b { background: linear-gradient(90deg, #6d3dff, #8e65ff); }
+.center-panel { display: grid; place-items: center; gap: 0.2rem; padding: 0 0.6rem; }
+.center-panel .arena-brand { font-size: 1.4rem; opacity: 0.8; }
+.center-panel .center-time { font: 800 1.2rem ui-monospace, monospace; padding: 0.2rem 0.6rem; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.25); }
+
+/* Glow pulse on score */
+@keyframes scorePulseA { from { box-shadow: 0 0 0 rgba(45,211,111,0); } to { box-shadow: 0 0 40px rgba(45,211,111,0.55); } }
+@keyframes scorePulseB { from { box-shadow: 0 0 0 rgba(109,61,255,0); } to { box-shadow: 0 0 40px rgba(109,61,255,0.55); } }
+.jumbotron.pulse-a { animation: scorePulseA 0.42s ease-out; }
+.jumbotron.pulse-b { animation: scorePulseB 0.42s ease-out; }
+
+/* Confetti minimal effect */
+.confetti { position: absolute; top: 10%; width: 48%; height: 0; pointer-events: none; }
+.confetti-left { left: 0; }
+.confetti-right { right: 0; }
+.confetti::before, .confetti::after { content: ''; position: absolute; width: 100%; height: 140px; background:
+  radial-gradient(circle at 10% 20%, rgba(255,196,0,0.9) 0px, rgba(255,196,0,0.9) 4px, transparent 5px),
+  radial-gradient(circle at 40% 40%, rgba(45,211,111,0.9) 0px, rgba(45,211,111,0.9) 3px, transparent 4px),
+  radial-gradient(circle at 70% 30%, rgba(109,61,255,0.9) 0px, rgba(109,61,255,0.9) 3px, transparent 4px),
+  radial-gradient(circle at 90% 60%, rgba(209,0,80,0.9) 0px, rgba(209,0,80,0.9) 3px, transparent 4px);
+  animation: confettiFall 0.9s ease-in forwards;
+  opacity: 0.85;
+}
+@keyframes confettiFall { from { transform: translateY(-10px) scale(1); opacity: 0.9; } to { transform: translateY(80px) scale(0.95); opacity: 0; } }
+
+/* Mobile tabs */
+.mobile-tabs { display: none; margin: 0.2rem auto 0.6rem; width: min(700px, 96%); gap: 6px; justify-content: center; }
+.mobile-tabs .tab { padding: 0.4rem 0.8rem; border-radius: 999px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.25); color: #fff; cursor: pointer; }
+.mobile-tabs .tab.active { border-color: var(--gold-500); box-shadow: 0 0 0 2px rgba(255,196,0,0.2); }
+
+/* Players columns responsive & glass */
+.players-columns { width: min(1200px, 98%); margin: 0 auto; display: grid; grid-template-columns: repeat(2, minmax(320px, 1fr)); gap: 1rem; }
+.players-columns app-team-players-column { background: var(--ui-bg-panel); border: 1px solid var(--glass-border); border-radius: 14px; box-shadow: var(--arena-glow); padding: 0.6rem; }
+
+/* Make columns switch to tabs on small screens */
+@media (max-width: 860px) {
+  .mobile-tabs { display: flex; }
+  .players-columns { grid-template-columns: 1fr; }
+  .players-columns[data-tab='A'] .col-b { display: none; }
+  .players-columns[data-tab='B'] .col-a { display: none; }
+}
+
+/* Tablet enhancements: tighter margins and optional 2-col player list could be handled inside the component if needed */
+@media (min-width: 861px) and (max-width: 1120px) {
+  .players-columns { gap: 0.8rem; }
+}

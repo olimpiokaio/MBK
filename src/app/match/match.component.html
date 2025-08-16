@@ -89,28 +89,49 @@
   @if (gameStarted()) {
     <section class="game-screen">
       <header class="game-header">
-        <h2 class="game-title">Street Game • {{ communityName() || ('Comunidade #' + communityId()) }}</h2>
+        <h2 class="game-title">Arena Match • {{ communityName() || ('Comunidade #' + communityId()) }}</h2>
         <div class="timer">
           <button class="mute-btn pause-btn" type="button" (click)="toggleNarrator()">{{ narratorOn() ? 'Mutar Narrador' : 'Ativar Narrador' }}</button>
           <button class="speak-score-btn pause-btn" type="button" (click)="speakCurrentScore()">Falar Placar</button>
-          <span class="time-display">{{ formatTime(timeLeft()) }}</span>
           <button class="pause-btn" type="button" (click)="toggleTimer()">{{ running() ? 'Pausar' : 'Continuar' }}</button>
         </div>
       </header>
 
-      <div class="scoreboard">
-        <div class="score team-a">
-          <div class="label">Time A</div>
-          <div class="value">{{ scoreA() }}</div>
+      <!-- Jumbotron NBA-style scoreboard -->
+      <div class="jumbotron" [class.pulse-a]="scoreboardPulse() && lastScoredTeam() === 'A'" [class.pulse-b]="scoreboardPulse() && lastScoredTeam() === 'B'" role="region" aria-live="polite" aria-label="Placar do jogo">
+        <div class="team-panel left">
+          <div class="team-name">
+            <span class="name">Time A</span>
+            <span class="color-bar a" aria-hidden="true"></span>
+          </div>
+          <div class="team-score" aria-label="Placar Time A">{{ scoreA() }}</div>
         </div>
-        <div class="score team-b">
-          <div class="label">Time B</div>
-          <div class="value">{{ scoreB() }}</div>
+        <div class="center-panel">
+          <div class="arena-brand" aria-hidden="true">TEMPO</div>
+          <div class="center-time">{{ formatTime(timeLeft()) }}</div>
         </div>
+        <div class="team-panel right">
+          <div class="team-name">
+            <span class="name">Time B</span>
+            <span class="color-bar b" aria-hidden="true"></span>
+          </div>
+          <div class="team-score" aria-label="Placar Time B">{{ scoreB() }}</div>
+        </div>
+
+        <!-- Confetti burst -->
+        @if (confettiSide() === 'A') { <div class="confetti confetti-left" aria-hidden="true"></div> }
+        @if (confettiSide() === 'B') { <div class="confetti confetti-right" aria-hidden="true"></div> }
       </div>
 
-      <div class="players-columns">
+      <!-- Mobile Tabs for team columns -->
+      <nav class="mobile-tabs" role="tablist" aria-label="Alternar times">
+        <button role="tab" [attr.aria-selected]="mobileTab() === 'A'" (click)="mobileTab.set('A')" class="tab" [class.active]="mobileTab() === 'A'">Time A</button>
+        <button role="tab" [attr.aria-selected]="mobileTab() === 'B'" (click)="mobileTab.set('B')" class="tab" [class.active]="mobileTab() === 'B'">Time B</button>
+      </nav>
+
+      <div class="players-columns" [attr.data-tab]="mobileTab()">
         <app-team-players-column
+          class="col-a"
           title="Jogadores A"
           [teamId]="'A'"
           [players]="teamA()"
@@ -121,6 +142,7 @@
           (adjust)="openAdjustPoints($event.team, $event.player, $event.points)"
         />
         <app-team-players-column
+          class="col-b"
           title="Jogadores B"
           [teamId]="'B'"
           [players]="teamB()"
