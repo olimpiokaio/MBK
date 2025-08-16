@@ -34,4 +34,27 @@ export class TeamPlayersColumnComponent {
     if (this.disabled) return;
     this.adjust.emit({ team: this.teamId, player, points });
   }
+
+  animateAndAdjust(target: EventTarget | null, player: Player, points: number) {
+    if (this.disabled) return;
+
+    const el = target as HTMLElement | null;
+    if (el) {
+      // set spin count via CSS var and add spin class
+      const spins = Math.max(1, Math.min(3, Math.floor(points)));
+      el.style.setProperty('--spin-count', String(spins));
+      el.classList.remove('bb-spin');
+      // Force reflow to restart animation if clicked repeatedly
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      void el.offsetWidth;
+      el.classList.add('bb-spin');
+
+      const durationMs = 600 * spins;
+      window.setTimeout(() => {
+        el.classList.remove('bb-spin');
+      }, durationMs + 50);
+    }
+
+    this.adjust.emit({ team: this.teamId, player, points });
+  }
 }

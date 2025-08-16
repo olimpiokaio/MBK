@@ -13,9 +13,9 @@
           <span class="match-pts">{{ getPoints(p) }} pts</span>
         </div>
         <div class="actions">
-          <button type="button" (click)="onAdjust(p, 1)" [disabled]="disabled">P1</button>
-          <button type="button" (click)="onAdjust(p, 2)" [disabled]="disabled">P2</button>
-          <button type="button" (click)="onAdjust(p, 3)" [disabled]="disabled">P3</button>
+          <button type="button" class="bb-btn" [style.background-image]="'url(/bola-icon.png)'" [attr.aria-label]="'Somar 1 ponto'" (click)="animateAndAdjust($event.currentTarget, p, 1)" [disabled]="disabled">1</button>
+          <button type="button" class="bb-btn" [style.background-image]="'url(/bola-icon.png)'" [attr.aria-label]="'Somar 2 pontos'" (click)="animateAndAdjust($event.currentTarget, p, 2)" [disabled]="disabled">2</button>
+          <button type="button" class="bb-btn" [style.background-image]="'url(/bola-icon.png)'" [attr.aria-label]="'Somar 3 pontos'" (click)="animateAndAdjust($event.currentTarget, p, 3)" [disabled]="disabled">3</button>
         </div>
       </li>
     }
