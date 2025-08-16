@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
   styleUrl: './back-button.component.css',
 })
 export class BackButtonComponent {
-  @Input() label: string = '← VOLTAR';
+  @Input() label: string = '← Back';
   /**
    * If provided and back is false, the button will navigate using routerLink
    * Default is "/" to mimic existing behavior.

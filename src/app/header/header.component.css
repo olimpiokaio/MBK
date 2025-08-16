@@ -6,11 +6,10 @@
 
 .app-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between; /* logo à esquerda, controles à direita */
   align-items: center;
-  padding: 8px 10px;
+  padding: 8px 10px 2px;
   transition: opacity 300ms ease, background-color 300ms ease;
-  background: transparent;
   opacity: 1;
 }
 
@@ -21,6 +20,19 @@
 .controls {
   display: flex;
   gap: 8px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 4rem;
+}
+
+.logo img {
+  height: 3.4rem;
+  width: auto;
+  display: inline-block;
 }
 
 .icon-btn {

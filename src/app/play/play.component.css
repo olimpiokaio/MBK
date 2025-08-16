@@ -1,6 +1,7 @@
 .content-play {
   margin-top: 0.4rem;
   padding: 2rem 0;
+  border-radius: 1.4rem;
   background:
       radial-gradient(circle at 50% 20%,
         #0b1a4a 0%,
