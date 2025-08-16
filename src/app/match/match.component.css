@@ -345,7 +345,7 @@
 }
 .stats-btn:hover { box-shadow: 0 0 0 2px rgba(109,61,255,0.25); }
 
-.stats-modal { width: min(94vw, 540px); }
+.stats-modal { width: min(94vw, 540px); text-align: center; }
 .stat-list { list-style: none; padding: 0; margin: 0 0 0.8rem; display: grid; gap: 0.4rem; }
 .stat-list li { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); padding: 0.5rem 0.6rem; border-radius: 10px; }
 .stat-list strong { color: var(--gold-500); margin-right: 0.35rem; }
