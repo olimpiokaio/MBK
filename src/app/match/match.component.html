@@ -119,9 +119,9 @@
                   <span class="match-pts">{{ getPlayerMatchPoints(p) }} pts</span>
                 </div>
                 <div class="actions">
-                  <button type="button" (click)="openAdjustPoints('A', p, 1)" [disabled]="winner() !== null">+1</button>
-                  <button type="button" (click)="openAdjustPoints('A', p, 2)" [disabled]="winner() !== null">+2</button>
-                  <button type="button" (click)="openAdjustPoints('A', p, 3)" [disabled]="winner() !== null">+3</button>
+                  <button type="button" (click)="openAdjustPoints('A', p, 1)" [disabled]="winner() !== null">P1</button>
+                  <button type="button" (click)="openAdjustPoints('A', p, 2)" [disabled]="winner() !== null">P2</button>
+                  <button type="button" (click)="openAdjustPoints('A', p, 3)" [disabled]="winner() !== null">P3</button>
                 </div>
               </li>
             }
@@ -138,9 +138,9 @@
                   <span class="match-pts">{{ getPlayerMatchPoints(p) }} pts</span>
                 </div>
                 <div class="actions">
-                  <button type="button" (click)="openAdjustPoints('B', p, 1)" [disabled]="winner() !== null">+1</button>
-                  <button type="button" (click)="openAdjustPoints('B', p, 2)" [disabled]="winner() !== null">+2</button>
-                  <button type="button" (click)="openAdjustPoints('B', p, 3)" [disabled]="winner() !== null">+3</button>
+                  <button type="button" (click)="openAdjustPoints('B', p, 1)" [disabled]="winner() !== null">P1</button>
+                  <button type="button" (click)="openAdjustPoints('B', p, 2)" [disabled]="winner() !== null">P2</button>
+                  <button type="button" (click)="openAdjustPoints('B', p, 3)" [disabled]="winner() !== null">P3</button>
                 </div>
               </li>
             }
