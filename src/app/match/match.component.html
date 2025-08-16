@@ -185,19 +185,12 @@
             </ul>
 
             @if (bestPlayer()) {
-              <div class="twoK-card" [attr.data-tier]="computeTier(getPlayerMatchPoints(bestPlayer()!))">
-                <div class="twoK-frame">
-                  <img class="twoK-photo" [src]="bestPlayer()!.playerImage" [alt]="bestPlayer()!.playerName" />
-                  <div class="twoK-info">
-                    <div class="twoK-tier">{{ computeTier(getPlayerMatchPoints(bestPlayer()!)) }}</div>
-                    <div class="twoK-name">{{ bestPlayer()!.playerName }}</div>
-                    <div class="twoK-badges">
-                      <span class="badge">LV {{ bestPlayer()!.level }}</span>
-                      <span class="badge">{{ getPlayerMatchPoints(bestPlayer()!) }} PTS</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <app-card-qualificacao
+                [player]="bestPlayer()!"
+                [teamPlayers]="teamFor(bestPlayer()!)"
+                [pointsRecord]="playerPointsRecord()"
+                [animated]="true"
+              />
             }
 
             <button type="button" class="btn-cancel" (click)="closeStats()">Fechar</button>

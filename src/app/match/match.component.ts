@@ -5,11 +5,12 @@ import { Player } from '../shared/types/player.model';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
 import { NarratorService } from '../services/narrator.service';
 import { TeamPlayersColumnComponent } from '../shared/team-players-column/team-players-column.component';
+import { CardQualificacaoComponent } from '../shared/card-qualificacao/card-qualificacao.component';
 
 @Component({
   selector: 'app-match',
   standalone: true,
-  imports: [BackButtonComponent, TeamPlayersColumnComponent],
+  imports: [BackButtonComponent, TeamPlayersColumnComponent, CardQualificacaoComponent],
   templateUrl: './match.component.html',
   styleUrl: './match.component.css'
 })
@@ -390,6 +391,12 @@ export class MatchComponent implements OnDestroy {
 
   openStats() { if (this.winner() !== null) this.statsOpen.set(true); }
   closeStats() { this.statsOpen.set(false); }
+
+    // Helper to get the team array of a given player by name
+    teamFor(p: Player): Player[] {
+      if (!p) return [];
+      return this.teamA().some(x => x.playerName === p.playerName) ? this.teamA() : this.teamB();
+    }
 
   computeTier(points: number): 'bronze' | 'silver' | 'gold' | 'diamond' {
     if (points >= 12) return 'diamond';

@@ -1,0 +1,14 @@
+<div class="twoK-card" [class.animated]="animated" [attr.data-tier]="tier()">
+  <div class="twoK-frame">
+    <img class="twoK-photo" [src]="player.playerImage" [alt]="player.playerName" />
+    <div class="twoK-info">
+      <div class="twoK-tier">{{ tierLabel() }}</div>
+      <div class="twoK-name">{{ player.playerName }}</div>
+      <div class="twoK-badges">
+        <span class="badge">LV {{ player.level }}</span>
+        <span class="badge">{{ playerPoints() }} PTS</span>
+        <span class="badge subtle" title="Diferença para a média do time">{{ diffLabel() }}</span>
+      </div>
+    </div>
+  </div>
+</div>

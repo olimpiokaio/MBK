@@ -50,7 +50,7 @@
   height: 54px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid transparent;
+  border: 3px solid transparent;
   box-shadow: 0 2px 6px rgba(0,0,0,0.35);
   transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
