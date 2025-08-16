@@ -211,7 +211,17 @@ export class MatchComponent {
 
     // Announce only when points were added (not subtracted)
     if (delta > 0) {
-      this.narrator.announceScore(player.playerName, delta, newScoreA, newScoreB);
+      const totalsObj: Record<string, number> = Object.fromEntries(this.playerPoints());
+      this.narrator.announceScore(
+        player.playerName,
+        delta,
+        newScoreA,
+        newScoreB,
+        {
+          scoringTeam: team,
+          playerTotals: totalsObj
+        }
+      );
     }
   }
 
