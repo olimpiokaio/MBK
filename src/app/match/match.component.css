@@ -156,3 +156,56 @@
   padding: 1rem;
   border-radius: 12px;
 }
+
+/* New: Team selection blocks */
+.teams-select {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.team-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.6);
+  color: var(--ice);
+  background:
+    radial-gradient(circle at 10% -30%, rgba(109,61,255,0.18), transparent 60%),
+    linear-gradient(180deg, rgba(13, 13, 40, 0.7), rgba(16, 16, 38, 0.7));
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.team-card:hover { transform: translateY(-2px); border-color: var(--gold-500); }
+.team-card.active {
+  border-color: var(--gold-500);
+  box-shadow: 0 0 0 2px rgba(255,196,0,0.25);
+}
+.team-title { font-weight: 700; letter-spacing: 0.3px; }
+.team-count { font-variant-numeric: tabular-nums; opacity: 0.95; }
+
+.hint { margin: 0.6rem 0; color: #cfd3ff; opacity: 0.95; }
+
+/* Selection states for player cards */
+.player-card.selected {
+  border-color: #36d36a;
+  box-shadow: 0 0 0 2px rgba(54,211,106,0.25), 0 12px 28px rgba(0,0,0,0.55);
+}
+.player-card.disabled {
+  opacity: 0.55;
+  filter: grayscale(30%);
+  cursor: not-allowed;
+}
+
+/* Summary styles */
+.summary { margin-top: 1rem; padding: 0.8rem; border: 2px solid rgba(255,255,255,0.15); border-radius: 12px; }
+.teams-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.team-summary h4 { margin: 0 0 0.4rem; }
+.team-summary ul { margin: 0; padding-left: 1rem; }
+.actions { margin-top: 0.8rem; text-align: right; }
+.reset-btn { padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.6); background: transparent; color: var(--ice); cursor: pointer; }
+.reset-btn:hover { border-color: var(--gold-500); }

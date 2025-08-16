@@ -8,25 +8,76 @@
     <p class="match-sub">Players da comunidade · <span class="badge-count">{{ players().length }}</span></p>
   </header>
 
-  <div class="players-grid">
-    @if (players().length === 0) {
-      <p class="empty">Nenhum jogador encontrado para esta comunidade.</p>
-    } @else {
-      @for (p of players(); track $index) {
-        <article class="player-card" tabindex="0">
-          <div class="avatar-wrap">
-            <img class="avatar" [src]="p.playerImage" [alt]="p.playerName" loading="lazy" />
-            <span class="lvl-chip" title="Nível">LV {{ p.level }}</span>
-          </div>
-          <div class="player-info">
-            <h3 class="player-name">{{ p.playerName }}</h3>
-            <ul class="stats">
-              <li><span class="stat-label">Idade</span><span class="stat-value">{{ p.age }}</span></li>
-              <li><span class="stat-label">Pontos</span><span class="stat-value">{{ p.totalPoints }}</span></li>
-            </ul>
-          </div>
-        </article>
-      }
-    }
+  <!-- Team chooser blocks -->
+  <div class="teams-select">
+    <button class="team-card" [class.active]="selectedTeam() === 'A'" (click)="chooseTeam('A')" type="button">
+      <div class="team-title">Time A</div>
+      <div class="team-count">{{ teamA().length }} / {{ maxPerTeam }}</div>
+    </button>
+    <button class="team-card" [class.active]="selectedTeam() === 'B'" (click)="chooseTeam('B')" type="button">
+      <div class="team-title">Time B</div>
+      <div class="team-count">{{ teamB().length }} / {{ maxPerTeam }}</div>
+    </button>
   </div>
+
+  @if (!selectedTeam() && !allSelected()) {
+    <p class="hint">Selecione um time para começar a escolher os jogadores.</p>
+  }
+
+  <!-- Players list for current selection -->
+  @if (!allSelected()) {
+    <div class="players-grid">
+      @if (players().length === 0) {
+        <p class="empty">Nenhum jogador encontrado para esta comunidade.</p>
+      } @else {
+        @for (p of players(); track $index) {
+          <article class="player-card"
+                   [class.selected]="isSelectedForCurrent(p)"
+                   [class.disabled]="!canSelect(p) && !isSelectedForCurrent(p)"
+                   (click)="togglePlayer(p)"
+                   tabindex="0">
+            <div class="avatar-wrap">
+              <img class="avatar" [src]="p.playerImage" [alt]="p.playerName" loading="lazy" />
+              <span class="lvl-chip" title="Nível">LV {{ p.level }}</span>
+            </div>
+            <div class="player-info">
+              <h3 class="player-name">{{ p.playerName }}</h3>
+              <ul class="stats">
+                <li><span class="stat-label">Idade</span><span class="stat-value">{{ p.age }}</span></li>
+                <li><span class="stat-label">Pontos</span><span class="stat-value">{{ p.totalPoints }}</span></li>
+              </ul>
+            </div>
+          </article>
+        }
+      }
+    </div>
+  }
+
+  <!-- Summary when both teams are complete -->
+  @if (allSelected()) {
+    <section class="summary">
+      <h3>Resumo dos Times</h3>
+      <div class="teams-summary">
+        <div class="team-summary">
+          <h4>Time A</h4>
+          <ul>
+            @for (p of teamA(); track $index) {
+              <li>{{ p.playerName }} · LV {{ p.level }} · {{ p.totalPoints }} pts</li>
+            }
+          </ul>
+        </div>
+        <div class="team-summary">
+          <h4>Time B</h4>
+          <ul>
+            @for (p of teamB(); track $index) {
+              <li>{{ p.playerName }} · LV {{ p.level }} · {{ p.totalPoints }} pts</li>
+            }
+          </ul>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="reset-btn" type="button" (click)="resetSelection()">Refazer seleção</button>
+      </div>
+    </section>
+  }
 </section>
