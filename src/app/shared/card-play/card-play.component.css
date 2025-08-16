@@ -8,16 +8,16 @@
   overflow: hidden;
   background:
     radial-gradient(circle at 50% 20%,
-      #1d1135 0%,
+    #1d1135 0%,
       /* Espaço profundo */
-      #0a0a2e 30%,
-      #0b1a4a 60%,
-      #1a1a2e 100%),
+    #0a0a2e 30%,
+    #0b1a4a 60%,
+    #1a1a2e 100%),
     repeating-linear-gradient(-45deg,
-      transparent 0px,
-      transparent 2px,
-      #6d3dff0a 3px,
-      transparent 4px);
+    transparent 0px,
+    transparent 2px,
+    #6d3dff0a 3px,
+    transparent 4px);
   border: 2px solid #6d3dff33;
   box-shadow:
     0 0 40px #6d3dff33,
@@ -38,13 +38,13 @@
   height: 200%;
   background:
     radial-gradient(circle at 70% 20%,
-      #c8102e33 0%,
+    #c8102e33 0%,
       /* Vermelho cósmico */
-      transparent 40%),
+    transparent 40%),
     radial-gradient(circle at 30% 80%,
-      #6d3dff33 0%,
+    #6d3dff33 0%,
       /* Roxo estelar */
-      transparent 50%);
+    transparent 50%);
   animation: nebula-rotate 40s infinite linear;
   mix-blend-mode: screen;
 }
@@ -84,8 +84,8 @@
   height: 100%;
   background:
     repeating-conic-gradient(from 0deg,
-      #6d3dff0a 0deg 10deg,
-      transparent 10deg 20deg);
+    #6d3dff0a 0deg 10deg,
+    transparent 10deg 20deg);
   animation: energy-pulse 4s infinite linear;
   mix-blend-mode: overlay;
 }
@@ -100,8 +100,8 @@
   overflow: hidden;
   mask:
     radial-gradient(circle at 50% 0%,
-      black 60%,
-      transparent 90%);
+    black 60%,
+    transparent 90%);
   border: 2px solid #6d3dff;
   background: linear-gradient(45deg, #1d1135, #0b1a4a);
 }
@@ -140,30 +140,4 @@
   color: #774afc;
   text-shadow: 0 0 7px #6d3dff;
   animation: stat-glow 2s infinite alternate;
-}
-
-/* Mobile responsiveness for the card */
-@media (max-width: 600px) {
-  .cosmic-card {
-    height: 360px;
-    border-radius: 18px;
-  }
-  .player-holo {
-    width: 80%;
-    height: 58%;
-    left: 10%;
-    top: 14%;
-    border-radius: 12px;
-  }
-  .cosmic-stats {
-    bottom: 14px;
-    gap: 8px;
-    padding: 0 12px;
-  }
-  .cosmic-stat {
-    padding: 8px;
-  }
-  .stat-value {
-    font-size: 1.4em;
-  }
 }
