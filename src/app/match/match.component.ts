@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MatchService } from './match.service';
+import { PlayersService } from '../services/players.service';
 import { Player } from '../shared/types/player.model';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
 import { NarratorService } from '../services/narrator.service';
@@ -16,7 +16,7 @@ import { CardQualificacaoComponent } from '../shared/card-qualificacao/card-qual
 })
 export class MatchComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
-  private matchService = inject(MatchService);
+  private playersService = inject(PlayersService);
   private narrator = inject(NarratorService);
 
   communityId = signal<string>('');
@@ -62,7 +62,10 @@ export class MatchComponent implements OnDestroy {
     const state = history.state as { name?: string };
     this.communityName.set(state?.name ?? '');
 
-    this.players.set(this.matchService.getPlayersByCommunity(id));
+    // Simula chamada HTTP para obter jogadores por comunidade
+    this.playersService.getPlayersByCommunity(id).subscribe(list => {
+      this.players.set(list);
+    });
   }
 
   chooseTeam(team: 'A' | 'B') {
