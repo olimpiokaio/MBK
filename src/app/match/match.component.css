@@ -408,7 +408,7 @@
   --ui-bg-dark: #0c0e16;
   --ui-bg-panel: rgba(16, 18, 30, 0.6);
   --glass: rgba(255, 255, 255, 0.08);
-  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-border: rgba(255, 255, 255, 0.42);
   --team-a: #2dd36f;
   --team-b: #6d3dff;
   --ball-orange: #d86e2a;
@@ -459,6 +459,7 @@
   backdrop-filter: blur(8px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--arena-glow), inset 0 0 0 1px rgba(255,255,255,0.06);
+  font-weight: bold;
 }
 .jumbotron::before {
   content: '';
@@ -473,7 +474,7 @@
   border-radius: inherit;
   background: url('../../../public/quadra-icon.png') center/220px auto no-repeat;
   opacity: 0.10; /* show image lightly to keep scoreboard contrast */
-  filter: saturate(80%) brightness(120%);
+  filter: saturate(80%) brightness(100%);
   pointer-events: none;
 }
 .team-panel { display: grid; gap: 0.2rem; justify-items: center; }
@@ -487,7 +488,14 @@
 .color-bar.b { background: linear-gradient(90deg, #6d3dff, #8e65ff); }
 .center-panel { display: grid; place-items: center; gap: 0.2rem; padding: 0 0.6rem; }
 .center-panel .arena-brand { font-size: 1.4rem; opacity: 0.8; }
-.center-panel .center-time { font: 800 1.2rem ui-monospace, monospace; padding: 0.2rem 0.6rem; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.25); }
+.center-panel .center-time {
+  font: 800 1.2rem ui-monospace, monospace;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: rgba(0,0,0,0.25);
+  opacity: 0.8;
+}
 
 /* Glow pulse on score */
 @keyframes scorePulseA { from { box-shadow: 0 0 0 rgba(45,211,111,0); } to { box-shadow: 0 0 40px rgba(45,211,111,0.55); } }
@@ -515,8 +523,28 @@
 .mobile-tabs .tab.active { border-color: var(--gold-500); box-shadow: 0 0 0 2px rgba(255,196,0,0.2); }
 
 /* Players columns responsive & glass */
-.players-columns { width: min(1200px, 98%); margin: 0 auto; display: grid; grid-template-columns: repeat(2, minmax(320px, 1fr)); gap: 1rem; }
-.players-columns app-team-players-column { background: var(--ui-bg-panel); border: 1px solid var(--glass-border); border-radius: 14px; box-shadow: var(--arena-glow); padding: 0.6rem; }
+.players-columns {
+  width: min(1200px, 98%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  gap: 1rem;
+}
+.players-columns app-team-players-column { background: var(--ui-bg-panel); border: 1px solid var(--glass-border); border-radius: 14px; box-shadow: var(--arena-glow); padding: 0.6rem; position: relative; overflow: hidden; }
+/* Stronger per-team contrast on columns */
+.players-columns app-team-players-column.col-a { border-color: rgba(45,211,111,0.8); box-shadow: var(--arena-glow), 0 0 0 2px rgba(45,211,111,0.20) inset; }
+.players-columns app-team-players-column.col-b { border-color: rgba(109,61,255,0.8); box-shadow: var(--arena-glow), 0 0 0 2px rgba(109,61,255,0.20) inset; }
+/* Subtle team-tinted background gradients for readability */
+.players-columns app-team-players-column.col-a::before,
+.players-columns app-team-players-column.col-b::before {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 60% at 0% 0%, rgba(45,211,111,0.10), rgba(0,0,0,0) 60%);
+}
+.players-columns app-team-players-column.col-b::before {
+  background: radial-gradient(120% 60% at 100% 0%, rgba(109,61,255,0.12), rgba(0,0,0,0) 60%);
+}
 
 /* Make columns switch to tabs on small screens */
 @media (max-width: 860px) {

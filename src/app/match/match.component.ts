@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatchService } from './match.service';
 import { Player } from '../shared/types/player.model';
@@ -13,7 +13,7 @@ import { TeamPlayersColumnComponent } from '../shared/team-players-column/team-p
   templateUrl: './match.component.html',
   styleUrl: './match.component.css'
 })
-export class MatchComponent {
+export class MatchComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   private matchService = inject(MatchService);
   private narrator = inject(NarratorService);
@@ -397,4 +397,11 @@ export class MatchComponent {
     if (points >= 6) return 'silver';
     return 'bronze';
   }
+
+  ngOnDestroy(): void {
+    // Ensure narrator stops speaking when leaving the match screen
+    try { this.narrator.stop(); } catch {}
+    // Also stop any running timers to avoid leaks
+    try { this.stopTimer(); } catch {}
   }
+}

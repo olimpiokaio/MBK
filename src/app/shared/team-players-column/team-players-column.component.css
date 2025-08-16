@@ -5,15 +5,37 @@
 }
 .team-column h3 {
   margin: 0 0 8px 0;
+  font-weight: 800;
 }
+/* Reset default list spacing to align player rows with the team title */
+.team-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+/* Team header accent for better contrast */
+.team-a-col > h3, .team-b-col > h3 {
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.5);
+  letter-spacing: 0.5px;
+}
+.team-a-col > h3 { background: linear-gradient(90deg, rgba(45,211,111,0.25), rgba(45,211,111,0.05)); border-color: rgba(45,211,111,0.7); }
+.team-b-col > h3 { background: linear-gradient(90deg, rgba(109,61,255,0.25), rgba(109,61,255,0.05)); border-color: rgba(109,61,255,0.7); }
+
 .player-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px;
+  padding: 8px 8px 8px 10px; /* left padding matches h3 (10px) for visual alignment */
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.04);
 }
+/* Stronger per-team row separators and hover for readability */
+.team-a-col .player-row { border-left: 4px solid rgba(45,211,111,0.6); background: linear-gradient(90deg, rgba(45,211,111,0.08), rgba(255,255,255,0.02)); }
+.team-b-col .player-row { border-left: 4px solid rgba(109,61,255,0.6); background: linear-gradient(90deg, rgba(109,61,255,0.08), rgba(255,255,255,0.02)); }
+.team-a-col .player-row:hover { background: linear-gradient(90deg, rgba(45,211,111,0.16), rgba(255,255,255,0.04)); }
+.team-b-col .player-row:hover { background: linear-gradient(90deg, rgba(109,61,255,0.16), rgba(255,255,255,0.04)); }
 .info {
   display: flex;
   align-items: center;
@@ -51,12 +73,12 @@
   --spin-count: 1;
 }
 .actions .bb-btn {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: none;
   font-weight: bold;
-  font-size: 2rem;
+  font-size: 1.8rem;
   text-align: center;
   text-shadow: 0 1px 0 rgba(255, 205, 153, 0.25);
   color: rgba(0, 0, 0, 0.85);
