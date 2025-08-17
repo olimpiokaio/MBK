@@ -21,7 +21,7 @@ export class PlayersService {
       new Player('Cavalo', 'https://i.pinimg.com/736x/2c/f7/a5/2cf7a5d343064d2941f2d39c85659d40.jpg', 19, 0, 0),
       new Player('Leandro', 'https://i.pinimg.com/originals/c3/30/74/c33074b9525f3dbff9c6344ee0710161.png', 23, 0, 0),
       new Player('Rodrigo', 'https://www.meganerd.it/wp-content/uploads/2022/05/Jotaro.0.jpeg', 22, 0, 0),
-      new Player('Enzo', 'https://gartic.com.br/imgs/mural/yz/yz_fer/enzo-3.png', 18, 0, 0),
+      new Player('Enzo', 'https://png.pngtree.com/png-clipart/20210308/original/pngtree-hand-drawn-cartoon-boy-playing-basketball-png-image_5771580.jpg', 18, 0, 0),
       new Player('Francisco', 'https://img.freepik.com/vetores-gratis/um-jogador-de-basquete-segura-uma-bola-com-as-duas-maos-e-corre-com-ela_1150-40625.jpg', 25, 0, 0),
       new Player('Pedro Henrique', 'https://us.123rf.com/450wm/sila5775/sila57751708/sila5775170800141/84231414-basketball-player-running-front-view-designed-on-sunlight-background-graphic-vector.jpg', 23, 0, 0),
       new Player('Kaio Silva', 'kaio-icon.jpeg', 18, 0, 0),
