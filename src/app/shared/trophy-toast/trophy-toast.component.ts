@@ -30,11 +30,11 @@ export class TrophyToastComponent implements OnDestroy {
   readonly seloMeta: Record<string, SeloMeta> = {
     'selo-primeira-vitoria': { name: 'Primeira Vitória', image: '/selos/selo-primeira-vitoria.jpg' },
     'selo-mvp': { name: 'MVP', image: '/selos/selo-mvp.jpg' },
-    'selo-pontuador': { name: 'Pontuador', image: '/selos/selo-pontuador.jpg' },
+    'selo-pontuador': { name: 'O Maioral', image: '/selos/selo-pontuador.jpg' },
     'selo-imparavel': { name: 'Imparável', image: '/selos/selo-imparavel.jpg' },
-    'selo-lenda': { name: 'Lenda', image: '/selos/selo-lenda.jpg' },
-    'selo-2': { name: 'Selo 2', image: '/selos/selo-2.jpg' },
-    'selo-3': { name: 'Selo 3', image: '/selos/selo-3.jpg' },
+    'selo-lenda': { name: 'A Lenda Está Viva', image: '/selos/selo-lenda.jpg' },
+    'selo-2': { name: 'Sexta de 2', image: '/selos/selo-2.jpg' },
+    'selo-3': { name: 'Sexta de 3', image: '/selos/selo-3.jpg' },
   };
 
   constructor(private selos: SelosService) {
