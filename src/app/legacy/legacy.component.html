@@ -1,1 +1,21 @@
-<p>legacy works!</p>
+<div class="legacy-container">
+  <div class="top-bar">
+    <app-back-button [back]="true" label="← VOLTAR" ariaLabel="Voltar"></app-back-button>
+  </div>
+  <h2>Legacy</h2>
+  <p class="subtitle">Seus selos conquistados aparecerão com cor. Os demais ficam em preto e branco.</p>
+
+  <div class="selo-grid">
+    <div
+      class="selo-card"
+      *ngFor="let selo of selos"
+      [class.earned]="selo.earned"
+      [style.background-image]="'url(' + selo.image + ')'"
+      role="img"
+      [attr.aria-label]="selo.name"
+      title="{{ selo.name }}"
+    >
+      <div class="selo-name">{{ selo.name }}</div>
+    </div>
+  </div>
+</div>
