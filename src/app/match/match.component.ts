@@ -159,6 +159,9 @@ export class MatchComponent implements OnDestroy {
 
   // GAME LOGIC
   startGame() {
+    // reset narrator for a new match (unlock narration if it was finalized)
+    try { this.narrator.resetForNewMatch(); } catch {}
+
     // initialize player points map
     const map = new Map<string, number>();
     const playersInMatch = [...this.teamA(), ...this.teamB()];

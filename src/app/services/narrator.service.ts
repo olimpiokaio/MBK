@@ -48,6 +48,11 @@ export class NarratorService {
   private _stopRequested = false;
   private _currentUtterance: SpeechSynthesisUtterance | null = null;
   private _pendingCount = 0; // chunks pendentes na fila atual
+  // Token de geração para invalidar filas agendadas antes de um stop()
+  private _queueToken = 0;
+
+  // Flag de finalização da narração: após o fim da partida, nada mais é enfileirado
+  private _finalized = false;
 
   /**
    * Sorteia um item de um array com leve proteção contra repetição imediata.
@@ -99,6 +104,15 @@ export class NarratorService {
   setRomuloStyle(enabled: boolean) {
     this.style = enabled ? 'romulo' : 'default';
     try { localStorage.setItem('narrator.style', this.style); } catch {}
+  }
+
+  /**
+   * Reseta o estado de finalização para uma nova partida.
+   * Também interrompe qualquer fala pendente por segurança.
+   */
+  public resetForNewMatch(): void {
+    this._finalized = false;
+    this.stop();
   }
 
   // Força a escolha de uma voz específica pelo nome (se disponível)
@@ -192,9 +206,10 @@ export class NarratorService {
    */
   public speak(
     text: string,
-    opts?: { voiceName?: string; rate?: number; pitch?: number; volume?: number; maxChunkChars?: number }
+    opts?: { voiceName?: string; rate?: number; pitch?: number; volume?: number; maxChunkChars?: number; allowAfterFinalize?: boolean }
   ): Promise<void> {
     if (!this.enabled) return Promise.resolve();
+    if (this._finalized && !opts?.allowAfterFinalize) return Promise.resolve();
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return Promise.resolve();
 
     // Atualiza voz preferida se enviada nesta chamada (aplica a partir da próxima utterance)
@@ -208,19 +223,26 @@ export class NarratorService {
     // Se não há conteúdo, encerra
     if (chunks.length === 0) return Promise.resolve();
 
+    // Captura o token atual da fila; qualquer stop() incrementará e invalidará esta execução
+    const token = this._queueToken;
+
     // Serializa execução numa chain para garantir ordem
     const run = async () => {
+      // Se a fila foi invalidada antes de iniciar, apenas saia silenciosamente
+      if (token !== this._queueToken) return;
       try {
         this._stopRequested = false; // nova execução
         await this.ensureReady();
+        if (token !== this._queueToken) return;
         const synth = window.speechSynthesis;
         // Se engine estiver pausado, tenta retomar
         if (synth.paused) try { synth.resume(); } catch {}
 
         this._pendingCount += chunks.length;
         for (const chunk of chunks) {
-          if (this._stopRequested) break;
+          if (this._stopRequested || token !== this._queueToken) break;
           await this.speakChunk(chunk, opts);
+          if (token !== this._queueToken) break;
         }
       } finally {
         // limpar contadores caso fila zere
@@ -228,7 +250,9 @@ export class NarratorService {
     };
 
     // Encadeia e retorna promessa concluída quando esta fala terminar
-    this._chain = this._chain.then(() => run()).catch(() => run());
+    this._chain = this._chain
+      .then(() => (token === this._queueToken ? run() : undefined))
+      .catch(() => (token === this._queueToken ? run() : undefined));
     return this._chain;
   }
 
@@ -236,6 +260,8 @@ export class NarratorService {
    * Interrompe imediatamente e limpa fila.
    */
   public stop(): void {
+    // Invalida qualquer execução agendada previamente
+    this._queueToken++;
     this._stopRequested = true;
     try {
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -645,6 +671,10 @@ export class NarratorService {
   }
 
   announceEnd(winner: 'A' | 'B' | 'Empate', mvpName?: string | null) {
+    // 1) Limpa imediatamente qualquer fala pendente/na fila
+    this.stop();
+
+    // 2) Monta resultado objetivo (quem venceu ou empate)
     let result: string;
     if (winner === 'Empate') {
       result = this.style === 'romulo' ? 'Fim de jogo! Tudo igual! Que drama!' : 'Fim de jogo: Empate! Jogaço equilibrado!';
@@ -652,7 +682,17 @@ export class NarratorService {
       const base = `Fim de jogo: ${winner === 'A' ? 'Time A' : 'Time B'} venceu!`;
       result = this.style === 'romulo' ? `${base} Que vitória!` : base; // explicita o nome do time
     }
+
+    // 3) MVP da Partida (se houver)
     const mvp = mvpName ? (this.style === 'romulo' ? ` MVP da partida: ${mvpName}!` : ` MVP: ${mvpName}. Que partida!`) : '';
-    this.speak(`${result}${mvp}`);
+
+    // 4) Despedida
+    const bye = this.style === 'romulo'
+      ? ' Valeu demais! Até a próxima!'
+      : ' Obrigado por acompanhar. Até a próxima!';
+
+    // 5) Seta flag de finalização para bloquear futuras falas e fala a mensagem final
+    this._finalized = true;
+    this.speak(`${result}${mvp}${bye}`, { allowAfterFinalize: true });
   }
 }
