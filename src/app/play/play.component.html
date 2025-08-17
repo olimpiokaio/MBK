@@ -7,10 +7,7 @@
   </div>
   <div class="list-communities">
     @if (loadingCommunities) {
-      <div class="loader-wrap">
-        <img class="spin-ball" src="bola-icon.png" alt="Carregando comunidades" />
-        <p class="loader-text">Carregando comunidades…</p>
-      </div>
+      <app-loading-spinner text="Carregando comunidades…" />
     } @else {
       @for (communit of comunitys; track $index) {
         <app-card-communit [community]="communit" (click)="onSelected(communit)"></app-card-communit>
