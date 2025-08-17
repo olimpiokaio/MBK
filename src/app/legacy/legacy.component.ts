@@ -28,4 +28,29 @@ export class LegacyComponent {
     { id: 'selo-2', name: 'Selo 2', image: '/selos/selo-2.jpg', earned: false },
     { id: 'selo-3', name: 'Selo 3', image: '/selos/selo-3.jpg', earned: false },
   ];
+
+  // Mapping of selo id to description (how to earn)
+  private descriptions: Record<string, string> = {
+    'selo-2': 'marque uma sexta de dois pontos.',
+    'selo-3': 'marque uma sexta de tres pontos.',
+    'selo-imparavel': 'ganhe tres partidas consecutivas.',
+    'selo-lenda': 'ganhe cinco partidas consecutivas.',
+    'selo-mvp': 'seja o MVP da partida.',
+    'selo-pontuador': 'atinja o total de 100 pontos.',
+    'selo-primeira-vitoria': 'ganhe uma partida.'
+  };
+
+  selectedSelo: Selo | null = null;
+
+  openSelo(selo: Selo) {
+    this.selectedSelo = selo;
+  }
+
+  closeOverlay() {
+    this.selectedSelo = null;
+  }
+
+  getSeloDescription(id: string): string {
+    return this.descriptions[id] || 'Descrição indisponível.';
+  }
 }

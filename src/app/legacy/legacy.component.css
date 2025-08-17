@@ -18,3 +18,46 @@
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 16px;
 }
+
+/* Overlay styles */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.overlay-content {
+  position: relative;
+  max-width: 520px;
+  width: calc(100% - 32px);
+  background: #121212;
+  color: #fff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.overlay-title {
+  margin: 0 0 8px 0;
+}
+
+.overlay-description {
+  margin: 0;
+  color: #ddd;
+  line-height: 1.5;
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+}

@@ -9,6 +9,7 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   filter: grayscale(100%); /* default: black & white */
   transition: transform 0.2s ease, filter 0.2s ease;
+  cursor: pointer;
 }
 
 .selo-card:hover {
