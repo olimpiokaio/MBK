@@ -1,1 +1,17 @@
-<p>community works!</p>
+<section class="content-play">
+  <div class="top-bar">
+    <app-back-button [route]="'/'" ariaLabel="Voltar para Home" label="← VOLTAR" />
+  </div>
+  <div class="title-container">
+    <span class="title">selecione a comunidade</span>
+  </div>
+  <div class="list-communities">
+    @if (loadingCommunities) {
+      <app-loading-spinner text="Carregando comunidades…" />
+    } @else {
+      @for (communit of comunitys; track $index) {
+        <app-card-communit [community]="communit" (click)="onSelected(communit)"></app-card-communit>
+      }
+    }
+  </div>
+</section>
