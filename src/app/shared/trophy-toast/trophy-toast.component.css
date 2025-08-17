@@ -47,7 +47,22 @@
 
 .trophy-texts {
   display: grid;
-  gap: 2px;
+  grid-template-columns: auto 2fr;
+  align-items: center;
+  gap: 4px;
+}
+
+.selo-inline {
+  display: grid;
+  place-items: start;
+}
+
+.selo-inline img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
 .trophy-title {
