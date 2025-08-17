@@ -524,7 +524,7 @@
 
 /* Players columns responsive & glass */
 .players-columns {
-  width: min(1200px, 98%);
+  width: min(1200px, 100%);
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(2, minmax(320px, 1fr));

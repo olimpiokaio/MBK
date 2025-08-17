@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
 import type { Player } from '../types/player.model';
+import { TruncatePipe } from '../pipes/truncate.pipe';
 
 @Component({
   selector: 'app-team-players-column',
   standalone: true,
+  imports: [TruncatePipe],
   templateUrl: './team-players-column.component.html',
   styleUrls: ['./team-players-column.component.css']
 })

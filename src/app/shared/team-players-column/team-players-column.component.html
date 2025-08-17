@@ -9,8 +9,10 @@
             @if (isTop(p)) { <span class="icon-badge icon-fire" aria-label="Top scorer">🔥</span> }
             @if (isBottom(p)) { <span class="icon-badge icon-ice" aria-label="Lowest scorer">🧊</span> }
           </span>
-          <span class="name">{{ p.playerName }}</span>
-          <span class="match-pts">{{ getPoints(p) }} pts</span>
+          <div>
+            <span class="name">{{ p.playerName | truncate:14 }}</span><br/>
+            <span class="match-pts">{{ getPoints(p) }} pts</span>
+          </div>
         </div>
         <div class="actions">
           <button type="button" class="bb-btn" [style.background-image]="'url(bola-icon.png)'" [attr.aria-label]="'Somar 1 ponto para ' + p.playerName" [attr.title]="'Somar 1 ponto para ' + p.playerName" (click)="animateAndAdjust($event.currentTarget, p, 1)" [disabled]="disabled">1</button>
