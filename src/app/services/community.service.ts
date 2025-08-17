@@ -12,7 +12,7 @@ export class CommunityService {
   private readonly communities: Communitiy[] = [
     new Communitiy(
       '1',
-      'colegas samamba norte',
+      'colegas samambaia norte',
       'https://wallpapers.com/images/featured/basketball-logo-png-wq7480oqk441mwto.jpg',
       18,
       new Date(),

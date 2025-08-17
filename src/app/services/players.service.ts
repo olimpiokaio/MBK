@@ -24,6 +24,7 @@ export class PlayersService {
       new Player('Henrique Moraes', 'https://randomuser.me/api/portraits/men/52.jpg', 28, 0, 0),
       new Player('Fábio Teixeira', 'https://randomuser.me/api/portraits/men/41.jpg', 25, 0, 0),
       new Player('Igor Ribeiro', 'https://randomuser.me/api/portraits/men/60.jpg', 23, 0, 0),
+      new Player('Kaio Silva', 'kaio-icon.jpeg', 30, 0, 0),
     ],
     '2': [
       new Player('Lucas Pereira', 'https://randomuser.me/api/portraits/men/12.jpg', 23, 0, 0),
