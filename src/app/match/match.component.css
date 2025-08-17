@@ -256,6 +256,13 @@
 .pause-btn { padding: 0.45rem 0.7rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.5); background: rgba(0,0,0,0.25); color: var(--ice); cursor: pointer; }
 .pause-btn:hover { border-color: var(--gold-500); }
 
+/* Icon button enhancements */
+.control-btn { display: inline-flex; align-items: center; gap: 0.45rem; line-height: 1; }
+.control-btn .btn-icon { display: inline-flex; width: 20px; height: 20px; }
+.control-btn svg { width: 20px; height: 20px; display: block; }
+.control-btn .btn-label { font-weight: 600; }
+.control-btn:focus-visible { outline: 2px solid var(--gold-500); outline-offset: 2px; }
+
 .scoreboard {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
