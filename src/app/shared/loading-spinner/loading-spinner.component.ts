@@ -1,8 +1,10 @@
 import { Component, Input } from '@angular/core';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-loading-spinner',
   standalone: true,
+  imports: [NgIf],
   template: `
     <div class="loader-wrap" role="status" aria-live="polite">
       <img class="spin-ball" src="/bola-icon.png" [alt]="text || 'Carregando'" />
