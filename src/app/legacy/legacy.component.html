@@ -21,8 +21,8 @@
   <div class="overlay" *ngIf="selectedSelo" (click)="closeOverlay()" role="dialog" aria-modal="true">
     <div class="overlay-content" (click)="$event.stopPropagation()">
       <button class="close-btn" (click)="closeOverlay()" aria-label="Fechar">×</button>
-      <h3 class="overlay-title">{{ selectedSelo?.name }}</h3>
-      <p class="overlay-description">{{ getSeloDescription(selectedSelo?.id || '') }}</p>
+      <h3 class="overlay-title">{{ selectedSelo.name }}</h3>
+      <p class="overlay-description">{{ getSeloDescription(selectedSelo.id || '') }}</p>
     </div>
   </div>
 </div>

@@ -10,9 +10,9 @@
       <div class="trophy-title">Selo conquistado!</div>
       <!-- Selo icon above the id -->
       <div class="selo-inline" *ngIf="getCurrentSeloImage() as img">
-        <img [src]="img" [alt]="getCurrentSeloName() || current?.id" />
+        <img [src]="img" [alt]="getCurrentSeloName() || current.id" />
       </div>
-      <div class="trophy-sub">{{ current?.id }}</div>
+      <div class="trophy-sub">{{ current.id }}</div>
     </div>
   </div>
 </div>
