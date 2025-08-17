@@ -7,7 +7,7 @@ import { NgIf } from '@angular/common';
   imports: [NgIf],
   template: `
     <div class="loader-wrap" role="status" aria-live="polite">
-      <img class="spin-ball" src="/bola-icon.png" [alt]="text || 'Carregando'" />
+      <img class="spin-ball" src="bola-icon.png" [alt]="text || 'Carregando'" />
       <p class="loader-text" *ngIf="text as t">{{ t }}</p>
     </div>
   `,
