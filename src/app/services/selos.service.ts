@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
 
 /**
  * SelosService
@@ -10,6 +11,11 @@ export class SelosService {
   private readonly STORAGE_KEY = 'mbk.selos.earned';
   private readonly WINS_STREAK_KEY = 'mbk.selos.winStreak';
   private readonly CURRENT_PLAYER_KEY = 'mbk.currentPlayerName';
+
+  /** Evento emitido quando um selo é conquistado pela primeira vez neste dispositivo. */
+  private earnedSubject = new Subject<{ id: string; at: number }>();
+  /** Observable público para que a UI possa reagir (ex.: mostrar animação estilo PlayStation). */
+  readonly earned$: Observable<{ id: string; at: number }> = this.earnedSubject.asObservable();
 
   /** Retorna o nome do jogador "atual" (salvo pela Home). */
   get currentPlayerName(): string | null {
@@ -51,6 +57,8 @@ export class SelosService {
     if (set.has(id)) return false;
     set.add(id);
     this.saveEarned(set);
+    // Emite evento para a UI reagir
+    try { this.earnedSubject.next({ id, at: Date.now() }); } catch {}
     return true;
   }
 

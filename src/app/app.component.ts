@@ -5,11 +5,12 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
 import { PlayComponent } from './play/play.component';
+import { TrophyToastComponent } from './shared/trophy-toast/trophy-toast.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, HomeComponent, PlayComponent],
+  imports: [RouterOutlet, HeaderComponent, HomeComponent, PlayComponent, TrophyToastComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
