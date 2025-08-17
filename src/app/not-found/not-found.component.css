@@ -12,8 +12,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: var(--nf-bg) center/cover no-repeat,
-              url('404/404baska.webp') center/cover fixed no-repeat;
+  background: var(--nf-bg) center/cover no-repeat;
   backdrop-filter: blur(2px);
 }
 
