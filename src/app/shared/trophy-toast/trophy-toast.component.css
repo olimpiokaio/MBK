@@ -1,6 +1,6 @@
 :root {
-  --trophy-bg: rgba(180, 180, 255, 0.92);
-  --trophy-border: rgba(255, 255, 255, 0.08);
+  --trophy-bg: rgba(109, 61, 255, 0.93);
+  --trophy-border: rgba(109, 61, 255, 0.93);
   --trophy-text: rgba(0, 0, 0, 0.85);
   --trophy-accent: #ffd54f; /* gold */
 }
@@ -9,7 +9,7 @@
   position: fixed;
   right: 20px;
   top: 20px; /* PlayStation-like top-right */
-  z-index: 900000;
+  z-index: 2147483647; /* ensure it overlays everything */
   transform: translateX(120%);
   opacity: 0;
   transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 600ms ease;
@@ -29,15 +29,15 @@
   max-width: 90vw;
   padding: 12px 14px;
   border-radius: 12px;
-  background: var(--trophy-bg);
+  background: rgba(15, 51, 147, 0.93);
   border: 1px solid var(--trophy-border);
   box-shadow: 0 12px 30px 10px rgba(0,0,0,0.35);
   color: var(--trophy-text);
 }
 
 .trophy-icon {
-  width: 42px;
-  height: 42px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   display: grid;
   place-items: center;
