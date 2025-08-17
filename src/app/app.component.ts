@@ -6,6 +6,7 @@ import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
 import { PlayComponent } from './play/play.component';
 import { TrophyToastComponent } from './shared/trophy-toast/trophy-toast.component';
+import { SelosService } from './services/selos.service';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,7 @@ export class AppComponent {
   title = 'MBK';
 
   private sanitizer = inject(DomSanitizer);
+  private selos = inject(SelosService);
 
   // Iframe element reference
   @ViewChild('bgPlayer') bgPlayer?: ElementRef<HTMLIFrameElement>;
@@ -68,6 +70,11 @@ export class AppComponent {
       '&enablejsapi=1' +
       '&origin=' + origin
     );
+  }
+
+  ngOnInit() {
+    // Clear earned trophies (selos) on every app reload as requested
+    try { this.selos.resetAll(); } catch {}
   }
 
   ngAfterViewInit() {
