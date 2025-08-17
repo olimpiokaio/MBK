@@ -6,8 +6,8 @@
   <!-- SELEÇÃO E RESUMO (antes de iniciar o jogo) -->
   @if (!gameStarted()) {
     <header class="match-header">
-      <h2 class="match-title">Match • {{ communityName() || ('Comunidade #' + communityId()) }}</h2>
-      <p class="match-sub">Players da comunidade · <span class="badge-count">{{ players().length }}</span></p>
+      <h2 class="match-title">Partida • {{ communityName() || ('Comunidade #' + communityId()) }}</h2>
+      <p class="match-sub">jogadores da comunidade · <span class="badge-count">{{ players().length }}</span></p>
     </header>
 
     <!-- Team chooser blocks -->

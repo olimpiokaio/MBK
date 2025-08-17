@@ -3,11 +3,14 @@
     <app-back-button [route]="'/'" ariaLabel="Voltar para Home" label="← VOLTAR" />
   </div>
   <div>
-    <span class="title">Selecte a Comunity</span>
+    <span class="title">selecione a comunidade</span>
   </div>
   <div class="list-communities">
     @if (loadingCommunities) {
-      <app-loading-spinner text="Carregando comunidades…" />
+      <div class="loader-wrap">
+        <img class="spin-ball" src="/bola-icon.png" alt="Carregando comunidades" />
+        <p class="loader-text">Carregando comunidades…</p>
+      </div>
     } @else {
       @for (communit of comunitys; track $index) {
         <app-card-communit [community]="communit" (click)="onSelected(communit)"></app-card-communit>
