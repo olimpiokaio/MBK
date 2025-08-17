@@ -24,7 +24,7 @@ export class PlayersService {
       new Player('Enzo', 'https://png.pngtree.com/png-clipart/20210308/original/pngtree-hand-drawn-cartoon-boy-playing-basketball-png-image_5771580.jpg', 18, 0, 0),
       new Player('Francisco', 'https://img.freepik.com/vetores-gratis/um-jogador-de-basquete-segura-uma-bola-com-as-duas-maos-e-corre-com-ela_1150-40625.jpg', 25, 0, 0),
       new Player('Pedro Henrique', 'https://us.123rf.com/450wm/sila5775/sila57751708/sila5775170800141/84231414-basketball-player-running-front-view-designed-on-sunlight-background-graphic-vector.jpg', 23, 0, 0),
-      new Player('Kaio Silva', 'kaio-icon.jpeg', 18, 0, 0),
+      new Player('Kaio Silva', 'kaio-icon.jpeg', 30, 0, 0),
       new Player('Vagner', 'https://img.freepik.com/vetores-premium/silhueta-de-chama-escura-de-drible-de-basquete_9245-116.jpg?w=360', 18, 0, 0),
       new Player('jogador 1', 'https://i.pinimg.com/originals/a4/0a/db/a40adbb4e98486e06a57bc75c4b06600.jpg', 18, 0, 0),
       new Player('jogador 2', 'https://i.pinimg.com/originals/a4/0a/db/a40adbb4e98486e06a57bc75c4b06600.jpg', 18, 0, 0),
