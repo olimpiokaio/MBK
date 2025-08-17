@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
+import { SeloComponent } from '../shared/selo/selo.component';
 
 interface Selo {
   id: string;
@@ -12,7 +13,7 @@ interface Selo {
 @Component({
   selector: 'app-legacy',
   standalone: true,
-  imports: [CommonModule, BackButtonComponent],
+  imports: [CommonModule, BackButtonComponent, SeloComponent],
   templateUrl: './legacy.component.html',
   styleUrl: './legacy.component.css'
 })

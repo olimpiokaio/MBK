@@ -1,0 +1,10 @@
+<div
+  class="selo-card"
+  [class.earned]="earned"
+  [style.background-image]="'url(' + image + ')'"
+  role="img"
+  [attr.aria-label]="ariaLabel || name"
+  [attr.title]="title || name"
+>
+  <div class="selo-name">{{ name }}</div>
+</div>

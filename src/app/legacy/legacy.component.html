@@ -6,16 +6,13 @@
   <p class="subtitle">Seus selos conquistados aparecerão com cor. Os demais ficam em preto e branco.</p>
 
   <div class="selo-grid">
-    <div
-      class="selo-card"
+    <app-selo
       *ngFor="let selo of selos"
-      [class.earned]="selo.earned"
-      [style.background-image]="'url(' + selo.image + ')'"
-      role="img"
-      [attr.aria-label]="selo.name"
-      title="{{ selo.name }}"
-    >
-      <div class="selo-name">{{ selo.name }}</div>
-    </div>
+      [name]="selo.name"
+      [image]="selo.image"
+      [earned]="selo.earned || false"
+      [ariaLabel]="selo.name"
+      [title]="selo.name"
+    ></app-selo>
   </div>
 </div>
