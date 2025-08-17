@@ -1,9 +1,9 @@
 
 
 <header class="app-header" [class.faded]="faded" (mouseenter)="onInteract()">
-  <div class="logo">
+  <a class="logo" routerLink="/" aria-label="Ir para a página inicial" title="Início">
     <img src="mbk-icon.png" alt="Logo" />
-  </div>
+  </a>
   <div class="controls">
     <button class="icon-btn" (click)="onTogglePlay()" aria-label="Pausar ou retomar música de fundo" title="Pausar/Retomar">
       <span *ngIf="!isPaused" aria-hidden="true">⏸</span>
