@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
 import { SeloComponent } from '../shared/selo/selo.component';
+import { SelosService } from '../services/selos.service';
 
 interface Selo {
   id: string;
@@ -18,6 +19,9 @@ interface Selo {
   styleUrl: './legacy.component.css'
 })
 export class LegacyComponent {
+  constructor(private selosService: SelosService) {
+    this.refreshEarned();
+  }
   // List of available selos. When integrating with backend, toggle `earned` to true to show in color.
   selos: Selo[] = [
     { id: 'selo-primeira-vitoria', name: 'Primeira Vitória', image: '/selos/selo-primeira-vitoria.jpg', earned: false },
@@ -48,6 +52,11 @@ export class LegacyComponent {
 
   closeOverlay() {
     this.selectedSelo = null;
+  }
+
+  private refreshEarned() {
+    const earned = this.selosService.getEarned();
+    this.selos = this.selos.map(s => ({ ...s, earned: earned.has(s.id) }));
   }
 
   getSeloDescription(id: string): string {

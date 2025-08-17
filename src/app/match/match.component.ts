@@ -5,6 +5,7 @@ import { Player } from '../shared/types/player.model';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
 import { NarratorService } from '../services/narrator.service';
 import { StatisticsService } from '../services/statistics.service';
+import { SelosService } from '../services/selos.service';
 import { TeamPlayersColumnComponent } from '../shared/team-players-column/team-players-column.component';
 import { CardQualificacaoComponent } from '../shared/card-qualificacao/card-qualificacao.component';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
@@ -21,6 +22,7 @@ export class MatchComponent implements OnDestroy {
   private playersService = inject(PlayersService);
   private narrator = inject(NarratorService);
   private stats = inject(StatisticsService);
+  private selos = inject(SelosService);
 
   // Loading state
   loadingPlayers = signal<boolean>(true);
@@ -281,6 +283,18 @@ export class MatchComponent implements OnDestroy {
         }
       );
     }
+
+    // Award selos for the current user based on scoring action (2 or 3 points)
+    if (delta > 0) {
+      const me = this.selos.currentPlayerName;
+      if (me && player.playerName === me && points > 0) {
+        if (points === 2) {
+          try { this.selos.earn('selo-2'); } catch {}
+        } else if (points === 3) {
+          try { this.selos.earn('selo-3'); } catch {}
+        }
+      }
+    }
   }
 
   // Modal logic for choosing to add or subtract points
@@ -338,6 +352,39 @@ export class MatchComponent implements OnDestroy {
     if (w !== null) {
       this.narrator.announceEnd(w, mvpName);
     }
+
+    // Award selos based on match results for the current user
+    try {
+      const meName = this.selos.currentPlayerName;
+      if (meName) {
+        const allPlayers = [...this.teamA(), ...this.teamB()];
+        const me = allPlayers.find(p => p.playerName === meName) || null;
+        // MVP
+        if (mvpName && mvpName === meName) {
+          this.selos.earn('selo-mvp');
+        }
+        // Vitória e sequência
+        if (w === 'A' || w === 'B') {
+          const winnersArr = w === 'A' ? this.teamA() : this.teamB();
+          const won = winnersArr.some(p => p.playerName === meName);
+          if (won) {
+            this.selos.earn('selo-primeira-vitoria');
+            const streak = this.selos.incWinStreak();
+            if (streak >= 3) this.selos.earn('selo-imparavel');
+            if (streak >= 5) this.selos.earn('selo-lenda');
+          } else {
+            this.selos.resetWinStreak();
+          }
+        } else {
+          // Empate não conta para sequência
+          this.selos.resetWinStreak();
+        }
+        // Pontuador (100 pontos totais ou mais)
+        if (me && me.totalPoints >= 100) {
+          this.selos.earn('selo-pontuador');
+        }
+      }
+    } catch {}
   }
 
   formatTime(totalSeconds: number): string {

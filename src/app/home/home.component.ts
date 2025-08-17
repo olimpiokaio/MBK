@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { CardPlayComponent } from "../shared/card-play/card-play.component";
 import { Player } from '../shared/types/player.model';
 import { PlayersService } from '../services/players.service';
+import { SelosService } from '../services/selos.service';
 
 @Component({
   selector: 'app-home',
@@ -21,7 +22,7 @@ export class HomeComponent implements OnInit {
     0
   );
 
-  constructor(private playersService: PlayersService) {}
+  constructor(private playersService: PlayersService, private selos: SelosService) {}
 
   ngOnInit(): void {
     // Busca jogadores da comunidade 1 e encontra o usuário "Kaio Silva"
@@ -29,6 +30,11 @@ export class HomeComponent implements OnInit {
       const kaio = players.find(p => p.playerName.toLowerCase() === 'kaio silva');
       if (kaio) {
         this.player = kaio;
+        // Persistir o jogador atual para que serviços de selos possam identificar o usuário
+        try { this.selos.setCurrentPlayerName(kaio.playerName); } catch {}
+      } else {
+        // fallback: ainda define o nome corrente baseado no placeholder (se existir)
+        try { this.selos.setCurrentPlayerName(this.player.playerName); } catch {}
       }
     });
   }
