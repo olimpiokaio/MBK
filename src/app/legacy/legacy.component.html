@@ -12,6 +12,10 @@
     <button class="filter-btn" [class.active]="filtro === 'not-earned'" (click)="setFiltro('not-earned')" [attr.aria-pressed]="filtro==='not-earned'">Não conquistados</button>
   </div>
 
+  <div *ngIf="filtro === 'earned' && filteredSelos.length === 0" class="empty-state" role="status" aria-live="polite">
+    Nada ainda, Qual foi jogador!
+  </div>
+
   <div class="selo-grid">
     <app-selo
       *ngFor="let selo of filteredSelos"

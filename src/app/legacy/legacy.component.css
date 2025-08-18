@@ -41,6 +41,12 @@
   gap: 16px;
 }
 
+.empty-state {
+  margin: 12px 0 20px;
+  color: #bbb;
+  font-size: 14px;
+}
+
 /* Overlay styles */
 .overlay {
   position: fixed;
