@@ -115,3 +115,27 @@ container-home {
    background-size: 5px 5px;
    z-index: -1;
  }
+
+ .mini-games {
+   cursor: pointer;
+   margin: auto;
+   margin-top: 0.4rem;
+   border: 2px solid white;
+   border-radius: 1rem;
+   padding: 0.1rem 0.2rem;
+   text-align: center;
+   height: 5rem;
+   background-color: #009a34;
+   will-change: transform, filter;
+ }.mini-games::before {
+    content: "";
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    border-radius: 1rem;
+    background: radial-gradient(circle, rgba(240, 240, 240, 0.363) 20%, transparent 21%);
+    background-size: 5px 5px;
+    z-index: -1;
+  }

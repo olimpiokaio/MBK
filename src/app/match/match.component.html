@@ -11,16 +11,18 @@
     </header>
 
     <!-- Team chooser blocks -->
-    <div class="teams-select">
-      <button class="team-card" [class.active]="selectedTeam() === 'A'" (click)="chooseTeam('A')" type="button">
-        <h1 class="team-title">Time A</h1>
-        <div class="team-count">{{ teamA().length }} / {{ maxPerTeam }}</div>
-      </button>
-      <button class="team-card" [class.active]="selectedTeam() === 'B'" (click)="chooseTeam('B')" type="button">
-        <h1 class="team-title">Time B</h1>
-        <div class="team-count">{{ teamB().length }} / {{ maxPerTeam }}</div>
-      </button>
-    </div>
+    @if (!allSelected()) {
+      <div class="teams-select">
+        <button class="team-card" [class.active]="selectedTeam() === 'A'" (click)="chooseTeam('A')" type="button">
+          <h1 class="team-title">Time A</h1>
+          <div class="team-count">{{ teamA().length }} / {{ maxPerTeam }}</div>
+        </button>
+        <button class="team-card" [class.active]="selectedTeam() === 'B'" (click)="chooseTeam('B')" type="button">
+          <h1 class="team-title">Time B</h1>
+          <div class="team-count">{{ teamB().length }} / {{ maxPerTeam }}</div>
+        </button>
+      </div>
+    }
 
     @if (!selectedTeam() && !allSelected()) {
       <p class="hint">Selecione um time para começar a escolher os jogadores.</p>
