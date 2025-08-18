@@ -6,13 +6,17 @@
 }
 
 .nf-container {
-  min-height: calc(100dvh - 80px);
-  /* account for header height if any; adjust if needed */
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: var(--nf-bg) center/cover no-repeat;
+  /* Two-layer background: gradient on top, image below from CSS var */
+  background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), var(--nf-bg-image);
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-size: cover, contain; /* gradient covers, image fits completely */
+  background-color: #000; /* fallback color around contained image */
   backdrop-filter: blur(2px);
 }
 
