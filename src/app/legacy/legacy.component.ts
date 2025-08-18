@@ -11,6 +11,8 @@ interface Selo {
   earned?: boolean; // future use
 }
 
+type SeloFilter = 'all' | 'earned' | 'not-earned';
+
 @Component({
   selector: 'app-legacy',
   standalone: true,
@@ -33,6 +35,9 @@ export class LegacyComponent {
     { id: 'selo-3', name: 'Selo 3', image: 'selos/selo-3.jpg', earned: false },
   ];
 
+  // Current selected filter
+  filtro: SeloFilter = 'all';
+
   // Mapping of selo id to description (how to earn)
   private descriptions: Record<string, string> = {
     'selo-2': 'marque uma sexta de dois pontos.',
@@ -45,6 +50,19 @@ export class LegacyComponent {
   };
 
   selectedSelo: Selo | null = null;
+
+  setFiltro(f: SeloFilter) { this.filtro = f; }
+
+  get filteredSelos(): Selo[] {
+    switch (this.filtro) {
+      case 'earned':
+        return this.selos.filter(s => !!s.earned);
+      case 'not-earned':
+        return this.selos.filter(s => !s.earned);
+      default:
+        return this.selos;
+    }
+  }
 
   openSelo(selo: Selo) {
     this.selectedSelo = selo;

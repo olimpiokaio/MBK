@@ -10,7 +10,29 @@
 
 .subtitle {
   color: #777;
+  margin-bottom: 12px;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
   margin-bottom: 16px;
+}
+
+.filter-btn {
+  padding: 6px 12px;
+  background: #1f1f1f;
+  color: #fff;
+  border: 2px solid #333;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+  background: #d10050; /* green highlight */
+  border-color: #020202;
 }
 
 .selo-grid {

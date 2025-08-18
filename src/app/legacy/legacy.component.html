@@ -6,9 +6,15 @@
   <h2 rel="legacy">Legado</h2>
   <p class="subtitle">Coleção de Selos.</p>
 
+  <div class="filters" role="group" aria-label="Filtros de selos">
+    <button class="filter-btn" [class.active]="filtro === 'all'" (click)="setFiltro('all')" [attr.aria-pressed]="filtro==='all'">Todos</button>
+    <button class="filter-btn" [class.active]="filtro === 'earned'" (click)="setFiltro('earned')" [attr.aria-pressed]="filtro==='earned'">Conquistados</button>
+    <button class="filter-btn" [class.active]="filtro === 'not-earned'" (click)="setFiltro('not-earned')" [attr.aria-pressed]="filtro==='not-earned'">Não conquistados</button>
+  </div>
+
   <div class="selo-grid">
     <app-selo
-      *ngFor="let selo of selos"
+      *ngFor="let selo of filteredSelos"
       [name]="selo.name"
       [image]="selo.image"
       [earned]="selo.earned || false"
