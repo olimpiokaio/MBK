@@ -127,3 +127,20 @@
 
 .owned { color: #9fe29f; font-weight: 700; display: inline-flex; align-items: center; gap: 10px; }
 .insufficient { color: #ff9f9f; font-weight: 600; }
+
+/* === Spend animation on purchase === */
+@keyframes coinSpendPulse {
+  0% { transform: scale(1) rotate(0); filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6)); }
+  20% { transform: scale(1.15) rotate(-6deg); filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.95)); }
+  60% { transform: scale(0.92) rotate(6deg); filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.4)); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes coinCountFlash {
+  0% { color: #ffd700; text-shadow: 0 0 6px rgba(255,215,0,0.7), 0 0 14px rgba(255,215,0,0.3); }
+  35% { color: #ff6b6b; text-shadow: 0 0 10px rgba(255,107,107,0.9), 0 0 20px rgba(255,107,107,0.4); }
+  100% { color: #ffd700; text-shadow: 0 0 6px rgba(255,215,0,0.7), 0 0 14px rgba(255,215,0,0.3); }
+}
+
+.coin-display.spend .coin-icon { animation: coinSpendPulse 0.6s ease both; }
+.coin-display.spend .coin-amount { animation: coinCountFlash 0.6s ease both; }

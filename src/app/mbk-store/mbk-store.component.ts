@@ -16,6 +16,10 @@ type StoreItem = { id: string; name: string; src: string; cost: number };
 })
 export class MbkStoreComponent implements OnDestroy {
   balance = 0;
+  // Valor exibido com animação
+  displayBalance = 0;
+  // Flag para classe de animação visual ao gastar
+  spendingPulse = false;
   private sub?: Subscription;
 
   readonly COST = 10;
@@ -61,7 +65,17 @@ export class MbkStoreComponent implements OnDestroy {
 
   constructor(private coins: CoinService, private selos: SelosService) {
     this.balance = this.coins.getBalance();
-    this.sub = this.coins.balanceObservable.subscribe(v => this.balance = v);
+    this.displayBalance = this.balance;
+    this.sub = this.coins.balanceObservable.subscribe(v => {
+      const prevDisplay = this.displayBalance;
+      this.balance = v;
+      // Anima somente quando diminuir (compra), senão atualiza direto
+      if (v < prevDisplay) {
+        this.animateDisplayBalance(prevDisplay, v, 600);
+      } else {
+        this.displayBalance = v;
+      }
+    });
   }
 
   isPurchased(item: StoreItem): boolean {
@@ -77,6 +91,7 @@ export class MbkStoreComponent implements OnDestroy {
     this.coins.addCoins(-item.cost);
     this.purchasedSet.add(item.id);
     this.persistPurchased();
+    this.triggerSpendPulse();
   }
 
   // === APLICAR/REMOVER BG ===
@@ -117,6 +132,38 @@ export class MbkStoreComponent implements OnDestroy {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(Array.from(this.purchasedSet)));
     } catch {}
+  }
+
+  private triggerSpendPulse() {
+    // Ativa classe CSS por um curto período
+    this.spendingPulse = false;
+    // Força reflow mínimo para reiniciar animação caso compras rápidas
+    setTimeout(() => {
+      this.spendingPulse = true;
+      setTimeout(() => this.spendingPulse = false, 650); // um pouco > duração da animação
+    }, 0);
+  }
+
+  private animateDisplayBalance(from: number, to: number, durationMs: number) {
+    const start = performance.now();
+    const diff = to - from; // negativo para diminuir
+    const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const step = (now: number) => {
+      const elapsed = now - start;
+      const t = Math.min(1, elapsed / durationMs);
+      const eased = easeOutCubic(t);
+      const value = from + diff * eased;
+      // Exibe valor inteiro
+      this.displayBalance = Math.round(value);
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else {
+        this.displayBalance = to;
+      }
+    };
+
+    requestAnimationFrame(step);
   }
 
   ngOnDestroy(): void {

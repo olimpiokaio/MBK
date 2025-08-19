@@ -6,9 +6,9 @@
   <h1 class="store-title">Loja</h1>
 
   <header class="store-header">
-    <div class="coin-display">
+    <div class="coin-display" [class.spend]="spendingPulse">
       <img class="coin-icon shimmer" src="/coin.png" alt="MB Coin" />
-      <span class="coin-amount shimmer-text">{{ balance }}</span>
+      <span class="coin-amount shimmer-text">{{ displayBalance }}</span>
     </div>
   </header>
 
