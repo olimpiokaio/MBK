@@ -7,6 +7,7 @@ import { HomeComponent } from './home/home.component';
 import { PlayComponent } from './play/play.component';
 import { TrophyToastComponent } from './shared/trophy-toast/trophy-toast.component';
 import { SelosService } from './services/selos.service';
+import { CoinService } from './services/coin.service';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,7 @@ export class AppComponent {
 
   private sanitizer = inject(DomSanitizer);
   private selos = inject(SelosService);
+  private coins = inject(CoinService);
 
   // Iframe element reference
   @ViewChild('bgPlayer') bgPlayer?: ElementRef<HTMLIFrameElement>;
@@ -75,6 +77,8 @@ export class AppComponent {
   ngOnInit() {
     // Clear earned trophies (selos) on every app reload as requested
     try { this.selos.resetAll(); } catch {}
+    // Clear user coins on every full page load/reload as requested
+    try { this.coins.setBalance(0); } catch {}
   }
 
   ngAfterViewInit() {

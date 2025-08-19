@@ -246,14 +246,25 @@
       <!-- Modal para somar/diminuir pontos -->
       @if (modalOpen()) {
         <div class="modal-overlay" (click)="closeModal()">
-          <div class="modal-card" (click)="$event.stopPropagation()">
-            <h3>Ajustar Pontos</h3>
+          <div class="modal-card adjust-modal" (click)="$event.stopPropagation()">
+            <h3 class="adjust-title">Ajustar Pontos</h3>
             @if (pendingAction()) {
-              <p>
-                Time {{ pendingAction()!.team }} •
-                {{ pendingAction()!.player.playerName }}<br />
-                Pontuação selecionada: <strong>{{ pendingAction()!.points }}</strong>
-              </p>
+              <div class="adjust-header">
+                <span class="avatar-badge-wrap">
+                  <img class="avatar-sm"
+                       [class.fire-border]="isTopScorer(pendingAction()!.player)"
+                       [class.ice-border]="isBottomScorer(pendingAction()!.player)"
+                       [src]="pendingAction()!.player.playerImage"
+                       [alt]="pendingAction()!.player.playerName" />
+                  @if (isTopScorer(pendingAction()!.player)) { <span class="icon-badge icon-fire" aria-label="Top scorer">🔥</span> }
+                  @if (isBottomScorer(pendingAction()!.player)) { <span class="icon-badge icon-ice" aria-label="Lowest scorer">🧊</span> }
+                </span>
+                <div class="who">
+                  <div class="team-chip">Time {{ pendingAction()!.team }}</div>
+                  <div class="player-name-strong">{{ pendingAction()!.player.playerName }}</div>
+                  <div class="selected-points">Pontuação selecionada: <strong>{{ pendingAction()!.points }}</strong></div>
+                </div>
+              </div>
             }
             <div class="modal-actions">
               <button type="button" class="btn-sub" (click)="confirmAdjust('sub')">Diminuir</button>
