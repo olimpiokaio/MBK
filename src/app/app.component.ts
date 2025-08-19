@@ -40,6 +40,7 @@ export class AppComponent {
     'yu2WGTZUgBo', // Don Toliver - No Comments,
     'jMjKz922Yh0', // DDG - She Don't Play
     'cbHkzwa0QmM', // Kendrick Lamar - peekaboo
+    'jfCnqyY3TZc', // Steve Lacy - Bad Habit
   ];
 
   // Background YouTube music URL (hidden iframe)
@@ -50,11 +51,12 @@ export class AppComponent {
   private listenerBound = false;
 
   private buildBgUrl(): string {
-    // Use the first ID as the initial video and the full list as the playlist.
+    // Pick a random ID as the initial video and use the full list as the playlist.
     const list = this.hipHopPlaylist && this.hipHopPlaylist.length > 0
-      ? this.hipHopPlaylist
+      ? [...this.hipHopPlaylist]
       : ['O-zpOMYRi0w'];
-    const initialId = list[0];
+    const randomIndex = Math.floor(Math.random() * list.length);
+    const initialId = list[randomIndex];
     const origin = encodeURIComponent(window.location.origin);
     const playlistParam = list.join(',');
 
