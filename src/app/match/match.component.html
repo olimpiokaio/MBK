@@ -243,37 +243,15 @@
         </div>
       }
 
-      <!-- Modal para somar/diminuir pontos -->
-      @if (modalOpen()) {
-        <div class="modal-overlay" (click)="closeModal()">
-          <div class="modal-card adjust-modal" (click)="$event.stopPropagation()">
-            <h3 class="adjust-title">Ajustar Pontos</h3>
-            @if (pendingAction()) {
-              <div class="adjust-header">
-                <span class="avatar-badge-wrap">
-                  <img class="avatar-sm"
-                       [class.fire-border]="isTopScorer(pendingAction()!.player)"
-                       [class.ice-border]="isBottomScorer(pendingAction()!.player)"
-                       [src]="pendingAction()!.player.playerImage"
-                       [alt]="pendingAction()!.player.playerName" />
-                  @if (isTopScorer(pendingAction()!.player)) { <span class="icon-badge icon-fire" aria-label="Top scorer">🔥</span> }
-                  @if (isBottomScorer(pendingAction()!.player)) { <span class="icon-badge icon-ice" aria-label="Lowest scorer">🧊</span> }
-                </span>
-                <div class="who">
-                  <div class="team-chip">Time {{ pendingAction()!.team }}</div>
-                  <div class="player-name-strong">{{ pendingAction()!.player.playerName }}</div>
-                  <div class="selected-points">Pontuação selecionada: <strong>{{ pendingAction()!.points }}</strong></div>
-                </div>
-              </div>
-            }
-            <div class="modal-actions">
-              <button type="button" class="btn-sub" (click)="confirmAdjust('sub')">Diminuir</button>
-              <button type="button" class="btn-sum" (click)="confirmAdjust('sum')">Somar</button>
-            </div>
-            <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
-          </div>
-        </div>
-      }
+      <!-- Modal para somar/diminuir pontos (componente) -->
+      <app-adjust-points-modal
+        [open]="modalOpen()"
+        [pendingAction]="pendingAction()"
+        [isTopScorer]="pendingAction() ? isTopScorer(pendingAction()!.player) : false"
+        [isBottomScorer]="pendingAction() ? isBottomScorer(pendingAction()!.player) : false"
+        (confirm)="confirmAdjust($event)"
+        (cancel)="closeModal()"
+      />
     </section>
   }
 </section>

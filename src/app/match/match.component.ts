@@ -10,11 +10,12 @@ import { CoinService } from '../services/coin.service';
 import { TeamPlayersColumnComponent } from '../shared/team-players-column/team-players-column.component';
 import { CardQualificacaoComponent } from '../shared/card-qualificacao/card-qualificacao.component';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
+import { AdjustPointsModalComponent } from '../shared/adjust-points-modal/adjust-points-modal.component';
 
 @Component({
   selector: 'app-match',
   standalone: true,
-  imports: [BackButtonComponent, TeamPlayersColumnComponent, CardQualificacaoComponent, LoadingSpinnerComponent],
+  imports: [BackButtonComponent, TeamPlayersColumnComponent, CardQualificacaoComponent, LoadingSpinnerComponent, AdjustPointsModalComponent],
   templateUrl: './match.component.html',
   styleUrl: './match.component.css'
 })

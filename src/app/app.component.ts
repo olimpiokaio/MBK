@@ -79,6 +79,21 @@ export class AppComponent {
     try { this.selos.resetAll(); } catch {}
     // Clear user coins on every full page load/reload as requested
     try { this.coins.setBalance(0); } catch {}
+
+    // Clear store purchases and applied background on every app restart
+    try {
+      // Remove purchased backgrounds list
+      localStorage.removeItem('mbk.store.purchased.backgrounds');
+      // Remove any applied background keys (may be per player)
+      const toRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('mbk.store.applied.background')) {
+          toRemove.push(k);
+        }
+      }
+      toRemove.forEach(k => localStorage.removeItem(k));
+    } catch {}
   }
 
   ngAfterViewInit() {
