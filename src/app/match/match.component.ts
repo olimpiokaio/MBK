@@ -6,14 +6,16 @@ import { BackButtonComponent } from '../shared/back-button/back-button.component
 import { NarratorService } from '../services/narrator.service';
 import { StatisticsService } from '../services/statistics.service';
 import { SelosService } from '../services/selos.service';
+import { CoinService } from '../services/coin.service';
 import { TeamPlayersColumnComponent } from '../shared/team-players-column/team-players-column.component';
 import { CardQualificacaoComponent } from '../shared/card-qualificacao/card-qualificacao.component';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
+import { AdjustPointsModalComponent } from '../shared/adjust-points-modal/adjust-points-modal.component';
 
 @Component({
   selector: 'app-match',
   standalone: true,
-  imports: [BackButtonComponent, TeamPlayersColumnComponent, CardQualificacaoComponent, LoadingSpinnerComponent],
+  imports: [BackButtonComponent, TeamPlayersColumnComponent, CardQualificacaoComponent, LoadingSpinnerComponent, AdjustPointsModalComponent],
   templateUrl: './match.component.html',
   styleUrl: './match.component.css'
 })
@@ -23,6 +25,8 @@ export class MatchComponent implements OnDestroy {
   private narrator = inject(NarratorService);
   private stats = inject(StatisticsService);
   private selos = inject(SelosService);
+  // Coins
+  private coins = inject(CoinService);
 
   // Loading state
   loadingPlayers = signal<boolean>(true);
@@ -345,6 +349,20 @@ export class MatchComponent implements OnDestroy {
       this.stats.setWinners(winners);
       this.stats.setMVP(this.mvpPlayer());
       this.stats.finalizeAndApply();
+    } catch {}
+
+    // Award MB Coin for victory (+1 if current player is on the winning team)
+    try {
+      if (w === 'A' || w === 'B') {
+        const meName = this.selos.currentPlayerName;
+        if (meName) {
+          const winnersArr = w === 'A' ? this.teamA() : this.teamB();
+          const won = winnersArr.some(p => p.playerName === meName);
+          if (won) {
+            this.coins.addCoins(1);
+          }
+        }
+      }
     } catch {}
 
     // Narrate end of game with winner and MVP

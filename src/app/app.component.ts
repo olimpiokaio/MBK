@@ -7,6 +7,7 @@ import { HomeComponent } from './home/home.component';
 import { PlayComponent } from './play/play.component';
 import { TrophyToastComponent } from './shared/trophy-toast/trophy-toast.component';
 import { SelosService } from './services/selos.service';
+import { CoinService } from './services/coin.service';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,7 @@ export class AppComponent {
 
   private sanitizer = inject(DomSanitizer);
   private selos = inject(SelosService);
+  private coins = inject(CoinService);
 
   // Iframe element reference
   @ViewChild('bgPlayer') bgPlayer?: ElementRef<HTMLIFrameElement>;
@@ -38,6 +40,7 @@ export class AppComponent {
     'yu2WGTZUgBo', // Don Toliver - No Comments,
     'jMjKz922Yh0', // DDG - She Don't Play
     'cbHkzwa0QmM', // Kendrick Lamar - peekaboo
+    'jfCnqyY3TZc', // Steve Lacy - Bad Habit
   ];
 
   // Background YouTube music URL (hidden iframe)
@@ -48,11 +51,12 @@ export class AppComponent {
   private listenerBound = false;
 
   private buildBgUrl(): string {
-    // Use the first ID as the initial video and the full list as the playlist.
+    // Pick a random ID as the initial video and use the full list as the playlist.
     const list = this.hipHopPlaylist && this.hipHopPlaylist.length > 0
-      ? this.hipHopPlaylist
+      ? [...this.hipHopPlaylist]
       : ['O-zpOMYRi0w'];
-    const initialId = list[0];
+    const randomIndex = Math.floor(Math.random() * list.length);
+    const initialId = list[randomIndex];
     const origin = encodeURIComponent(window.location.origin);
     const playlistParam = list.join(',');
 
@@ -75,6 +79,23 @@ export class AppComponent {
   ngOnInit() {
     // Clear earned trophies (selos) on every app reload as requested
     try { this.selos.resetAll(); } catch {}
+    // Clear user coins on every full page load/reload as requested
+    try { this.coins.setBalance(0); } catch {}
+
+    // Clear store purchases and applied background on every app restart
+    try {
+      // Remove purchased backgrounds list
+      localStorage.removeItem('mbk.store.purchased.backgrounds');
+      // Remove any applied background keys (may be per player)
+      const toRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('mbk.store.applied.background')) {
+          toRemove.push(k);
+        }
+      }
+      toRemove.forEach(k => localStorage.removeItem(k));
+    } catch {}
   }
 
   ngAfterViewInit() {

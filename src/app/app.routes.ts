@@ -12,5 +12,6 @@ export const routes: Routes = [
   { path: 'community', component: CommunityComponent },
   { path: 'legacy', component: LegacyComponent },
   { path: 'match/:id', component: MatchComponent },
+  { path: 'store', loadComponent: () => import('./mbk-store/mbk-store.component').then(m => m.MbkStoreComponent) },
   { path: '**', component: NotFoundComponent }
 ];

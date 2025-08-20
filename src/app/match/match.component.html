@@ -243,26 +243,15 @@
         </div>
       }
 
-      <!-- Modal para somar/diminuir pontos -->
-      @if (modalOpen()) {
-        <div class="modal-overlay" (click)="closeModal()">
-          <div class="modal-card" (click)="$event.stopPropagation()">
-            <h3>Ajustar Pontos</h3>
-            @if (pendingAction()) {
-              <p>
-                Time {{ pendingAction()!.team }} •
-                {{ pendingAction()!.player.playerName }}<br />
-                Pontuação selecionada: <strong>{{ pendingAction()!.points }}</strong>
-              </p>
-            }
-            <div class="modal-actions">
-              <button type="button" class="btn-sub" (click)="confirmAdjust('sub')">Diminuir</button>
-              <button type="button" class="btn-sum" (click)="confirmAdjust('sum')">Somar</button>
-            </div>
-            <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
-          </div>
-        </div>
-      }
+      <!-- Modal para somar/diminuir pontos (componente) -->
+      <app-adjust-points-modal
+        [open]="modalOpen()"
+        [pendingAction]="pendingAction()"
+        [isTopScorer]="pendingAction() ? isTopScorer(pendingAction()!.player) : false"
+        [isBottomScorer]="pendingAction() ? isBottomScorer(pendingAction()!.player) : false"
+        (confirm)="confirmAdjust($event)"
+        (cancel)="closeModal()"
+      />
     </section>
   }
 </section>

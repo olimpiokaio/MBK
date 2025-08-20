@@ -1,0 +1,30 @@
+@if (open) {
+  <div class="modal-overlay" (click)="onOverlayClick()">
+    <div class="modal-card adjust-modal" (click)="onCardClick($event)" [class.with-bg]="backgroundUrl" [style.background-image]="backgroundUrl ? 'url(' + backgroundUrl + ')' : null">
+      <h3 class="adjust-title">Ajustar Pontos</h3>
+      @if (pendingAction) {
+        <div class="adjust-header">
+          <span class="avatar-badge-wrap">
+            <img class="avatar-sm"
+                 [class.fire-border]="isTopScorer"
+                 [class.ice-border]="isBottomScorer"
+                 [src]="pendingAction!.player.playerImage"
+                 [alt]="pendingAction!.player.playerName" />
+            @if (isTopScorer) { <span class="icon-badge icon-fire" aria-label="Top scorer">🔥</span> }
+            @if (isBottomScorer) { <span class="icon-badge icon-ice" aria-label="Lowest scorer">🧊</span> }
+          </span>
+          <div class="who">
+            <div class="team-chip">Time {{ pendingAction!.team }}</div>
+            <div class="player-name-strong">{{ pendingAction!.player.playerName }}</div>
+            <div class="selected-points">Pontuação selecionada: <strong>{{ pendingAction!.points }}</strong></div>
+          </div>
+        </div>
+      }
+      <div class="modal-actions">
+        <button type="button" class="btn-sub" (click)="onConfirm('sub')">Diminuir</button>
+        <button type="button" class="btn-sum" (click)="onConfirm('sum')">Somar</button>
+      </div>
+      <button type="button" class="btn-cancel" (click)="cancel.emit()">Cancelar</button>
+    </div>
+  </div>
+}

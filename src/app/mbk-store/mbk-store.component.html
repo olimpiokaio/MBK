@@ -1,0 +1,49 @@
+<div class="store-page">
+  <div class="content-button-back">
+    <app-back-button [ariaLabel]="'Voltar'" [route]="'/'"></app-back-button>
+  </div>
+
+  <h1 class="store-title">Loja</h1>
+
+  <header class="store-header">
+    <div class="coin-display" [class.spend]="spendingPulse">
+      <img class="coin-icon shimmer" src="/coin.png" alt="MB Coin" />
+      <span class="coin-amount shimmer-text">{{ displayBalance }}</span>
+    </div>
+  </header>
+
+  <section class="store-content">
+    <div class="carousel">
+      <div class="carousel-track">
+        <div class="slide" *ngFor="let item of items; let i = index" [class.applied]="isApplied(item)">
+          <div class="gif-card">
+            <img [src]="item.src" [alt]="item.name" />
+            <span class="applied-badge" *ngIf="isApplied(item)" aria-label="Em uso">✓ Em uso</span>
+          </div>
+          <div class="actions">
+            <button class="buy-btn" [disabled]="!canBuy(item)" (click)="buy(item)" *ngIf="!isPurchased(item)" title="Comprar">
+              <span class="btn-ico" aria-hidden="true">🛒</span>
+              <span class="btn-text">Custa - {{ item.cost }} coins</span>
+            </button>
+            <ng-container *ngIf="isPurchased(item)">
+              <button class="buy-btn apply" (click)="apply(item)" *ngIf="!isApplied(item)" title="Aplicar este fundo">
+                <span class="btn-ico" aria-hidden="true">✨</span>
+                <span class="btn-text">Aplicar</span>
+              </button>
+              <div class="owned" *ngIf="isApplied(item)">
+                Em uso
+                <button class="remove-btn" (click)="clearApplied()" title="Remover este fundo">
+                  <span class="btn-ico" aria-hidden="true">🗑️</span>
+                  <span class="btn-text">Remover</span>
+                </button>
+              </div>
+            </ng-container>
+            <div class="insufficient" *ngIf="!isPurchased(item) && !canBuy(item)">
+              Coins insuficientes
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
