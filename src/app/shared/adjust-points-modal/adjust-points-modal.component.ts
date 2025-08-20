@@ -37,7 +37,7 @@ export class AdjustPointsModalComponent {
     const key = `${this.APPLIED_KEY_BASE}.${current}`;
     try {
       const id = localStorage.getItem(key);
-      return id ? `/background-modal/${id}` : null;
+      return id ? `background-modal/${id}` : null;
     } catch {
       return null;
     }

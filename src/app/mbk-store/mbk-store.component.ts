@@ -59,7 +59,7 @@ export class MbkStoreComponent implements OnDestroy {
     'the-nyan-cat.gif',
     'trikey-drama.gif',
     'wawa.gif',
-  ].map((file) => ({ id: file, name: file.replace('.gif',''), src: `/background-modal/${file}`, cost: this.COST }));
+  ].map((file) => ({ id: file, name: file.replace('.gif',''), src: `background-modal/${file}`, cost: this.COST }));
 
   private purchasedSet = new Set<string>(this.readPurchased());
 
