@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MBK - Redirecionando…</title>
+  <script>
+    // SPA fallback for GitHub Pages
+    // Redirect any 404 to the app root under the repository path.
+    (function() {
+      var repoBase = '/MBK';
+      // If you're serving under a custom domain without repo path, adjust repoBase to ''
+      var l = window.location;
+      // Avoid redirect loop
+      if (!l.pathname.startsWith(repoBase + '/')) {
+        // If user is at a 404 like /MBK/some/route, keep that. If not, just go to /MBK/
+        window.location.replace(repoBase + '/');
+      } else {
+        // Already under /MBK but GitHub served 404.html on deep link. Send to the app root.
+        window.location.replace(repoBase + '/');
+      }
+    })();
+  </script>
+  <noscript>
+    Esta aplicação requer JavaScript. <a href="/MBK/">Ir para a página inicial</a>.
+  </noscript>
+  <style>
+    html,body{height:100%;margin:0}
+    body{display:flex;align-items:center;justify-content:center;font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;color:#333}
+  </style>
+</head>
+<body>
+  Redirecionando…
+</body>
+</html>
