@@ -235,7 +235,7 @@ export class MatchComponent implements OnDestroy {
   }
 
   addPoints(team: 'A' | 'B', player: Player, points: number) {
-    if (!this.gameStarted() || this.winner()) return;
+    if (!this.gameStarted() || this.winner() || !this.running()) return;
     // update player points with clamping and compute actual delta applied
     const map = new Map(this.playerPoints());
     const current = map.get(player.playerName) ?? 0;
@@ -306,7 +306,7 @@ export class MatchComponent implements OnDestroy {
   pendingAction = signal<{ team: 'A' | 'B'; player: Player; points: number } | null>(null);
 
   openAdjustPoints(team: 'A' | 'B', player: Player, points: number) {
-    if (!this.gameStarted() || this.winner()) return;
+    if (!this.gameStarted() || this.winner() || !this.running()) return;
     this.pendingAction.set({ team, player, points });
     this.modalOpen.set(true);
   }

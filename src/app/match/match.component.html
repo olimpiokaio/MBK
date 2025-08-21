@@ -167,36 +167,38 @@
         @if (confettiSide() === 'B') { <div class="confetti confetti-right" aria-hidden="true"></div> }
       </div>
 
-      <!-- Mobile Tabs for team columns -->
-      <nav class="mobile-tabs" role="tablist" aria-label="Alternar times">
-        <button role="tab" [attr.aria-selected]="mobileTab() === 'A'" (click)="mobileTab.set('A')" class="tab" [class.active]="mobileTab() === 'A'">Time A</button>
-        <button role="tab" [attr.aria-selected]="mobileTab() === 'B'" (click)="mobileTab.set('B')" class="tab" [class.active]="mobileTab() === 'B'">Time B</button>
-      </nav>
+      @if (winner() === null) {
+        <!-- Mobile Tabs for team columns -->
+        <nav class="mobile-tabs" role="tablist" aria-label="Alternar times">
+          <button role="tab" [attr.aria-selected]="mobileTab() === 'A'" (click)="mobileTab.set('A')" class="tab" [class.active]="mobileTab() === 'A'">Time A</button>
+          <button role="tab" [attr.aria-selected]="mobileTab() === 'B'" (click)="mobileTab.set('B')" class="tab" [class.active]="mobileTab() === 'B'">Time B</button>
+        </nav>
 
-      <div class="players-columns" [attr.data-tab]="mobileTab()">
-        <app-team-players-column
-          class="col-a"
-          title="Jogadores A"
-          [teamId]="'A'"
-          [players]="teamA()"
-          [points]="playerPointsRecord()"
-          [topNames]="topNamesSet()"
-          [bottomNames]="bottomNamesSet()"
-          [disabled]="winner() !== null"
-          (adjust)="openAdjustPoints($event.team, $event.player, $event.points)"
-        />
-        <app-team-players-column
-          class="col-b"
-          title="Jogadores B"
-          [teamId]="'B'"
-          [players]="teamB()"
-          [points]="playerPointsRecord()"
-          [topNames]="topNamesSet()"
-          [bottomNames]="bottomNamesSet()"
-          [disabled]="winner() !== null"
-          (adjust)="openAdjustPoints($event.team, $event.player, $event.points)"
-        />
-      </div>
+        <div class="players-columns" [attr.data-tab]="mobileTab()">
+          <app-team-players-column
+            class="col-a"
+            title="Jogadores A"
+            [teamId]="'A'"
+            [players]="teamA()"
+            [points]="playerPointsRecord()"
+            [topNames]="topNamesSet()"
+            [bottomNames]="bottomNamesSet()"
+            [disabled]="winner() !== null || !running()"
+            (adjust)="openAdjustPoints($event.team, $event.player, $event.points)"
+          />
+          <app-team-players-column
+            class="col-b"
+            title="Jogadores B"
+            [teamId]="'B'"
+            [players]="teamB()"
+            [points]="playerPointsRecord()"
+            [topNames]="topNamesSet()"
+            [bottomNames]="bottomNamesSet()"
+            [disabled]="winner() !== null || !running()"
+            (adjust)="openAdjustPoints($event.team, $event.player, $event.points)"
+          />
+        </div>
+      }
 
       @if (winner() !== null) {
         <div class="game-result">
