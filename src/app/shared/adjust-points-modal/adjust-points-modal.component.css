@@ -1,7 +1,7 @@
 /* Extracted from match.component.css to restore pre-componentization modal visuals */
 
 /* Overlay and card */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: grid; place-items: center; z-index: 1000; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: grid; place-items: center; z-index: 1000; padding: 2rem 0 }
 .modal-card { width: min(92vw, 420px); background: #101028; color: var(--ice, #f8f8ff); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 1rem; box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
 .modal-card.with-bg { background-color: rgba(10,10,10,0.45); background-blend-mode: multiply; background-size: cover; background-position: center; color: #fff; border-color: rgba(255,255,255,0.35); }
 .modal-card h3 { margin: 0 0 0.4rem; }
