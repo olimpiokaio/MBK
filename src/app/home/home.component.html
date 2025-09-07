@@ -1,23 +1,38 @@
-<div class="container-home">
-  <app-card-play [player]="player" />
 
-  <div class="container-play-legacy">
-    <div class="home-play" routerLink="/community" type="button">
-      <h1>partida</h1>
-    </div>
-    <div class="home-legacy" routerLink="/legacy" type="button">
-      <h1 rel="Legacy">Legado</h1>
-      <span rel="Trophies">Troféus</span>
-    </div>
+<div class="home-header">
+  <h1>Meu Baska!</h1>
+  <p>jogue streetball e conecte-se com quem vive o basquete de rua.</p>
+</div>
+
+<div class="container-home">
+  <div class="content-card">
+    <h2 class="content-card-title">MBK</h2>
+    <app-card-play [player]="player" />
   </div>
-  <div class="home-store" routerLink="/store" type="button">
-    <h1 rel="Store">Loja</h1>
-  </div>
-  <div class="comunit">
-    <h1 rel="Comunit">Comunidades</h1>
+
+  <div>
+    <div class="container-play-legacy">
+      <div class="home-play" routerLink="/community" type="button">
+        <h1>partida</h1>
+      </div>
+      <div class="home-legacy" routerLink="/legacy" type="button">
+        <h1 rel="Legacy">Legado</h1>
+        <span rel="Trophies">Troféus</span>
+      </div>
+    </div>
+
+    <div class="container-store-community">
+      <div class="home-store" routerLink="/store" type="button">
+        <h1 rel="Store">Loja</h1>
+      </div>
+      <div class="community">
+        <h1 rel="Community">Comunidades</h1>
+      </div>
+    </div>
   </div>
 <!--  <div class="mini-games">-->
 <!--    <h1 rel="Mini Games">Mini Games</h1>-->
 <!--  </div>-->
 </div>
 
+<app-footer></app-footer>

@@ -4,13 +4,14 @@ import { BackButtonComponent } from '../shared/back-button/back-button.component
 import { CoinService } from '../services/coin.service';
 import { Subscription } from 'rxjs';
 import { SelosService } from '../services/selos.service';
+import {FooterComponent} from "../footer/footer.component";
 
 type StoreItem = { id: string; name: string; src: string; cost: number };
 
 @Component({
   selector: 'app-mbk-store',
   standalone: true,
-  imports: [CommonModule, BackButtonComponent],
+  imports: [CommonModule, BackButtonComponent, FooterComponent],
   templateUrl: './mbk-store.component.html',
   styleUrl: './mbk-store.component.css'
 })

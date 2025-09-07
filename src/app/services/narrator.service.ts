@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BackgroundMusicService } from './background-music.service';
 
 /**
  * Narrador (Web Speech API) robusto com chunking + fila sequencial.
@@ -69,7 +70,7 @@ export class NarratorService {
     return arr[idx];
   }
 
-  constructor() {
+  constructor(private bgm: BackgroundMusicService) {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       // Tenta carregar as vozes (alguns navegadores carregam de forma assíncrona)
       this.loadVoices();
@@ -234,6 +235,10 @@ export class NarratorService {
         this._stopRequested = false; // nova execução
         await this.ensureReady();
         if (token !== this._queueToken) return;
+
+        // Duck background music while narrator is speaking
+        try { this.bgm.duck(15, 250); } catch {}
+
         const synth = window.speechSynthesis;
         // Se engine estiver pausado, tenta retomar
         if (synth.paused) try { synth.resume(); } catch {}
@@ -246,6 +251,7 @@ export class NarratorService {
         }
       } finally {
         // limpar contadores caso fila zere
+        try { this.bgm.unduck(350); } catch {}
       }
     };
 

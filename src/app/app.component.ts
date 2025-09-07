@@ -32,15 +32,21 @@ export class AppComponent {
     '2OdrsOqZqh8', // Summer Walker - White Tee
     'j5-yKhDd64s', // Eminem - Not Afraid
     'O-zpOMYRi0w', // Hip Hop beat - mix (used previously)
-    'mEqDKq_GkJE', // Baby Bash - Baby, I'm Back ft. Akon
-    'XkQ1pltpQnw', // Don Toliver - You (feat. Travis Scott)
-    'wdwlRzZ7Slc', // Chris Brown - climax
-    'aq-DH4iwviE',  // Matuê - 333
+    'qFdK6S0nrQ4', // Wake Up - Skylar Blatt
+    'KlhuSz0HbcE', // Don Toliver - Tiramisu
+    '6ki21aILhoI', // The Game - Celebration
+    'aq-DH4iwviE', // Matuê - 333
+    'qvQ1h_plCUc', // Chris Brown - Real Hip Hop Shit #2 //
     '3KL9mRus19o', // Blackstreet - No Diggity
     'yu2WGTZUgBo', // Don Toliver - No Comments,
-    'jMjKz922Yh0', // DDG - She Don't Play
-    'cbHkzwa0QmM', // Kendrick Lamar - peekaboo
+    '8kS2dhmJdH0', // T.I. - Ball
     'jfCnqyY3TZc', // Steve Lacy - Bad Habit
+    'keBkITSkLlM', // Ludacris - Representin,
+    'CDAmjQY2N7A', // Big Sean - I Don't Fuck With You ft. E-40
+    'n9RIWKIwb-8', // Chris Brown, Tyga - Bitches N Marijuana (Audio) ft. ScHoolboy Q
+    'mjApIlxGlQg', // playboi carti - NO. 9
+    'IG6igUGyqoI', // Trippie Redd – Woke Up / The Face
+    'PvcHwwXtpu0', // Trippie Redd - Taking A Walk
   ];
 
   // Background YouTube music URL (hidden iframe)
