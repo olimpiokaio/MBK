@@ -12,7 +12,7 @@ body {
   font-optical-sizing: auto;
   font-style: normal;
   background: linear-gradient(to top, rgba(209, 0, 80, 0.5) 10%, rgba(11, 26, 74, 0.9)),
-  url("background-desktop/fundo-app.jpg") center/cover no-repeat border-box,
+  url("assets/background-desktop/fundo-app.jpg") center/cover no-repeat border-box,
   radial-gradient(closest-corner at 50% 20%, #1d1135 0%, #0a0a2e 30%, #0b1a4a 60%, #1a1a2e 100%);
   background-size: cover;
   background-position: center;
