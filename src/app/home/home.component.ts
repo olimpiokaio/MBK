@@ -4,11 +4,12 @@ import { CardPlayComponent } from "../shared/card-play/card-play.component";
 import { Player } from '../shared/types/player.model';
 import { PlayersService } from '../services/players.service';
 import { SelosService } from '../services/selos.service';
+import { FooterComponent } from "../footer/footer.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CardPlayComponent, RouterLink],
+  imports: [CardPlayComponent, RouterLink, FooterComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })

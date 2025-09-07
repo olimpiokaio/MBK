@@ -6,7 +6,7 @@
 
 .app-header {
   display: flex;
-  justify-content: space-between; /* logo à esquerda, controles à direita */
+  justify-content: space-between;
   align-items: center;
   padding: 8px 10px 2px;
   transition: opacity 300ms ease, background-color 300ms ease;
@@ -14,7 +14,7 @@
 }
 
 .app-header.faded {
-  opacity: 0.35; /* levemente visível */
+  opacity: 0.60; /* levemente visível */
 }
 
 .controls {

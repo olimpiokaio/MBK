@@ -2,20 +2,40 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
+  color: white;
   font-family: "Bebas Neue", sans-serif;
   font-optical-sizing: auto;
   font-style: normal;
-  background:
-    radial-gradient(closest-corner at 50% 20%,
-    #1d1135 0%,
-    #0a0a2e 30%,
-    #0b1a4a 60%,
-    #1a1a2e 100%),
-    repeating-linear-gradient(-45deg,
-    transparent 0px,
-    transparent 2px,
-    #6d3dff0a 3px,
-    transparent 4px);
-  color: #f8f8ff;
+  background: linear-gradient(to top, rgba(209, 0, 80, 0.5) 10%, rgba(11, 26, 74, 0.9)),
+  url("/background-desktop/fundo-app.jpg") center/cover no-repeat border-box,
+  radial-gradient(closest-corner at 50% 20%, #1d1135 0%, #0a0a2e 30%, #0b1a4a 60%, #1a1a2e 100%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: relative;
 }
+
+/*@media (min-width: 0px) {*/
+/*  body {*/
+/*    background:*/
+/*      radial-gradient(closest-corner at 50% 20%,*/
+/*      #1d1135 0%,*/
+/*      #0a0a2e 30%,*/
+/*      #0b1a4a 60%,*/
+/*      #1a1a2e 100%),*/
+/*      repeating-linear-gradient(-45deg,*/
+/*      transparent 0px,*/
+/*      transparent 2px,*/
+/*      #6d3dff0a 3px,*/
+/*      transparent 4px);*/
+/*    color: #f8f8ff;*/
+/*  }*/
+/*}*/
+
+

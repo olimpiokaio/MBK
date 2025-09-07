@@ -6,11 +6,12 @@ import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinn
 import { CommunityService } from '../services/community.service';
 import { PlayersService } from '../services/players.service';
 import { Communitiy } from './community.model';
+import {FooterComponent} from "../footer/footer.component";
 
 @Component({
   selector: 'app-community',
   standalone: true,
-  imports: [CardCommunitComponent, BackButtonComponent, LoadingSpinnerComponent],
+  imports: [CardCommunitComponent, BackButtonComponent, LoadingSpinnerComponent, FooterComponent],
   templateUrl: './community.component.html',
   styleUrl: './community.component.css'
 })
