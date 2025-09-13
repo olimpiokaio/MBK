@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
 import { CoinService } from '../services/coin.service';
 import { Subscription } from 'rxjs';
@@ -15,7 +15,9 @@ type StoreItem = { id: string; name: string; src: string; cost: number };
   templateUrl: './mbk-store.component.html',
   styleUrl: './mbk-store.component.css'
 })
-export class MbkStoreComponent implements OnDestroy {
+export class MbkStoreComponent implements OnDestroy, AfterViewInit {
+  @ViewChild('carouselContainer') private carouselContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('carouselTrack') private carouselTrack?: ElementRef<HTMLDivElement>;
   balance = 0;
   // Valor exibido com animação
   displayBalance = 0;
@@ -165,6 +167,29 @@ export class MbkStoreComponent implements OnDestroy {
     };
 
     requestAnimationFrame(step);
+  }
+
+  onNext() {
+    const container = this.carouselContainer?.nativeElement;
+    if (!container) return;
+    const amount = Math.round(container.clientWidth * 0.9);
+    container.scrollBy({ left: amount, behavior: 'smooth' });
+  }
+
+  onPrev() {
+    const container = this.carouselContainer?.nativeElement;
+    if (!container) return;
+    const amount = Math.round(container.clientWidth * 0.9);
+    container.scrollBy({ left: -amount, behavior: 'smooth' });
+  }
+
+  ngAfterViewInit(): void {
+    // Ensure the carousel starts at the first item (avoids any accidental offset)
+    const container = this.carouselContainer?.nativeElement;
+    if (container) {
+      // Use timeout to run after initial rendering/layout
+      setTimeout(() => container.scrollTo({ left: 0, behavior: 'auto' }), 0);
+    }
   }
 
   ngOnDestroy(): void {

@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 
 import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
@@ -12,12 +13,15 @@ import { CoinService } from './services/coin.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, HomeComponent, PlayComponent, TrophyToastComponent],
+  imports: [CommonModule, RouterOutlet, HeaderComponent, HomeComponent, PlayComponent, TrophyToastComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
   title = 'MBK';
+
+  // Demo modal flag
+  showDemoModal = false;
 
   private sanitizer = inject(DomSanitizer);
   private selos = inject(SelosService);
@@ -102,6 +106,9 @@ export class AppComponent {
       }
       toRemove.forEach(k => localStorage.removeItem(k));
     } catch {}
+
+    // Always show demo notice on site open (no session gating)
+    this.showDemoModal = true;
   }
 
   ngAfterViewInit() {
@@ -144,6 +151,13 @@ export class AppComponent {
     } catch (e) {
       // no-op
     }
+  }
+
+  acceptDemoNotice() {
+    try {
+      sessionStorage.setItem('mbk.demoNoticeShown', '1');
+    } catch {}
+    this.showDemoModal = false;
   }
 
   private activateAudio() {
