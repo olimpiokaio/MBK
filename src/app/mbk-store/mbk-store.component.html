@@ -13,37 +13,45 @@
   </header>
 
   <section class="store-content">
-    <div class="carousel">
-      <div class="carousel-track">
-        <div class="slide" *ngFor="let item of items; let i = index" [class.applied]="isApplied(item)">
-          <div class="gif-card">
-            <img [src]="item.src" [alt]="item.name" />
-            <span class="applied-badge" *ngIf="isApplied(item)" aria-label="Em uso">✓ Em uso</span>
-          </div>
-          <div class="actions">
-            <button class="buy-btn" [disabled]="!canBuy(item)" (click)="buy(item)" *ngIf="!isPurchased(item)" title="Comprar">
-              <span class="btn-ico" aria-hidden="true">🛒</span>
-              <span class="btn-text">Custa - {{ item.cost }} coins</span>
-            </button>
-            <ng-container *ngIf="isPurchased(item)">
-              <button class="buy-btn apply" (click)="apply(item)" *ngIf="!isApplied(item)" title="Aplicar este fundo">
-                <span class="btn-ico" aria-hidden="true">✨</span>
-                <span class="btn-text">Aplicar</span>
+    <div class="carousel-wrapper">
+      <div class="carousel" #carouselContainer>
+        <div class="carousel-track" #carouselTrack>
+          <div class="slide" *ngFor="let item of items; let i = index" [class.applied]="isApplied(item)">
+            <div class="gif-card">
+              <img [src]="item.src" [alt]="item.name" />
+              <span class="applied-badge" *ngIf="isApplied(item)" aria-label="Em uso">✓ Em uso</span>
+            </div>
+            <div class="actions">
+              <button class="buy-btn" [disabled]="!canBuy(item)" (click)="buy(item)" *ngIf="!isPurchased(item)" title="Comprar">
+                <span class="btn-ico" aria-hidden="true">🛒</span>
+                <span class="btn-text">Custa - {{ item.cost }} coins</span>
               </button>
-              <div class="owned" *ngIf="isApplied(item)">
-                Em uso
-                <button class="remove-btn" (click)="clearApplied()" title="Remover este fundo">
-                  <span class="btn-ico" aria-hidden="true">🗑️</span>
-                  <span class="btn-text">Remover</span>
+              <ng-container *ngIf="isPurchased(item)">
+                <button class="buy-btn apply" (click)="apply(item)" *ngIf="!isApplied(item)" title="Aplicar este fundo">
+                  <span class="btn-ico" aria-hidden="true">✨</span>
+                  <span class="btn-text">Aplicar</span>
                 </button>
+                <div class="owned" *ngIf="isApplied(item)">
+                  Em uso
+                  <button class="remove-btn" (click)="clearApplied()" title="Remover este fundo">
+                    <span class="btn-ico" aria-hidden="true">🗑️</span>
+                    <span class="btn-text">Remover</span>
+                  </button>
+                </div>
+              </ng-container>
+              <div class="insufficient" *ngIf="!isPurchased(item) && !canBuy(item)">
+                Coins insuficientes
               </div>
-            </ng-container>
-            <div class="insufficient" *ngIf="!isPurchased(item) && !canBuy(item)">
-              Coins insuficientes
             </div>
           </div>
         </div>
       </div>
+      <button class="carousel-btn prev" type="button" aria-label="Anterior" (click)="onPrev()">
+        <span aria-hidden="true">❮</span>
+      </button>
+      <button class="carousel-btn next" type="button" aria-label="Próximo" (click)="onNext()">
+        <span aria-hidden="true">❯</span>
+      </button>
     </div>
   </section>
 </div>

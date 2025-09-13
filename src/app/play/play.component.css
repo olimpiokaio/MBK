@@ -69,6 +69,10 @@
   filter: brightness(1.8);
 }
 
+.title-container {
+  margin-bottom: 2rem;
+}
+
 
 /* Loader styles for communities loading */
 .loader-wrap {

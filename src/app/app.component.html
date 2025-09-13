@@ -7,6 +7,29 @@
 <!-- Global trophy toast overlay -->
 <app-trophy-toast></app-trophy-toast>
 
+<!-- Demo notice modal -->
+<div
+  class="demo-modal-backdrop"
+  *ngIf="showDemoModal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="demoModalTitle"
+  aria-describedby="demoModalDesc"
+>
+  <div class="demo-modal">
+    <div class="demo-pill">
+      <div>MBK</div>
+    </div>
+    <h2 id="demoModalTitle">Versão demonstrativa</h2>
+    <p id="demoModalDesc">
+      Atenção: esta versão é apenas demonstrativa e os dados gerados serão removidos ao sair do site.
+    </p>
+    <button type="button" class="demo-btn" (click)="acceptDemoNotice()" autofocus>
+      Entendi
+    </button>
+  </div>
+</div>
+
 <!-- Hidden YouTube background audio (autoplays muted; unmuted on first user gesture) -->
 <iframe
   #bgPlayer
