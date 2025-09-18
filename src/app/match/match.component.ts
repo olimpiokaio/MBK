@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, OnDestroy } from '@angular/core';
+import { Component, computed, inject, signal, OnDestroy, effect } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PlayersService } from '../services/players.service';
 import { Player } from '../shared/types/player.model';
@@ -43,6 +43,66 @@ export class MatchComponent implements OnDestroy {
   // Derived state
   maxPerTeam = 3;
   allSelected = computed(() => this.teamA().length === this.maxPerTeam && this.teamB().length === this.maxPerTeam);
+
+  // Team strengths (sum of levels)
+  teamStrengthA = computed(() => this.teamA().reduce((sum, p) => sum + (p?.level ?? 0), 0));
+  teamStrengthB = computed(() => this.teamB().reduce((sum, p) => sum + (p?.level ?? 0), 0));
+
+  // Stars based on team strength thresholds
+  // < 10 => 1 star; > 10 => 2; > 30 => 3; > 40 => 4; > 100 => 5
+  private getTeamStarsCount(total: number): number {
+    if (total > 100) return 5;
+    if (total > 40) return 4;
+    if (total > 30) return 3;
+    if (total > 10) return 2;
+    return 1;
+  }
+
+  teamStarsA = computed(() => Array.from({ length: this.getTeamStarsCount(this.teamStrengthA()) }));
+  teamStarsB = computed(() => Array.from({ length: this.getTeamStarsCount(this.teamStrengthB()) }));
+
+  // ===== Carousel state (presentation when both teams are selected) =====
+  carouselIndexA = signal<number>(0);
+  carouselIndexB = signal<number>(0);
+  // Sorted players by level desc for each team
+  sortedTeamA = computed(() => [...this.teamA()].sort((a, b) => (b?.level ?? 0) - (a?.level ?? 0)));
+  sortedTeamB = computed(() => [...this.teamB()].sort((a, b) => (b?.level ?? 0) - (a?.level ?? 0)));
+
+  private centerOnHighestLevel() {
+    // As lists are sorted desc, index 0 is the highest
+    this.carouselIndexA.set(0);
+    this.carouselIndexB.set(0);
+  }
+
+  // Effect to center on the highest level when both teams are selected
+  centerEffect = effect(() => {
+    if (this.allSelected()) {
+      this.centerOnHighestLevel();
+    }
+  });
+
+  prev(team: 'A' | 'B') {
+    const list = team === 'A' ? this.sortedTeamA() : this.sortedTeamB();
+    if (!list.length) return;
+    if (team === 'A') this.carouselIndexA.set((this.carouselIndexA() - 1 + list.length) % list.length);
+    else this.carouselIndexB.set((this.carouselIndexB() - 1 + list.length) % list.length);
+  }
+
+  next(team: 'A' | 'B') {
+    const list = team === 'A' ? this.sortedTeamA() : this.sortedTeamB();
+    if (!list.length) return;
+    if (team === 'A') this.carouselIndexA.set((this.carouselIndexA() + 1) % list.length);
+    else this.carouselIndexB.set((this.carouselIndexB() + 1) % list.length);
+  }
+
+  getTriplet(team: 'A' | 'B') {
+    const list = team === 'A' ? this.sortedTeamA() : this.sortedTeamB();
+    const idx = team === 'A' ? this.carouselIndexA() : this.carouselIndexB();
+    if (list.length === 0) return [] as Player[];
+    const left = (idx - 1 + list.length) % list.length;
+    const right = (idx + 1) % list.length;
+    return [list[left], list[idx], list[right]];
+  }
 
   // Game state
   gameStarted = signal<boolean>(false);
