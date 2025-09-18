@@ -63,26 +63,86 @@
 
     <!-- Summary when both teams are complete -->
     @if (allSelected()) {
-      <section class="summary">
-        <h3>Resumo dos Times</h3>
-        <div class="teams-summary">
-          <div class="team-summary">
-            <h4>Time A</h4>
-            <ul>
-              @for (p of teamA(); track $index) {
-                <li>{{ p.playerName }} · LV {{ p.level }} · {{ p.totalPoints }} pts</li>
-              }
-            </ul>
+      <section class="summary enhanced">
+        <h3 class="summary-title">Resumo dos Times</h3>
+
+        <div class="teams-summary-grid" aria-label="Resumo visual dos times">
+          <!-- Lado A -->
+          <div class="team-side side-a">
+            <div class="team-head">
+              <h4 class="team-name">Time A</h4>
+            </div>
+
+            <!-- Carrossel Time A -->
+            <div class="team-carousel">
+              <button class="nav-btn prev" type="button" (click)="prev('A')" aria-label="Anterior">‹</button>
+
+              <div class="cards-rail" aria-live="polite">
+                @for (p of getTriplet('A'); track p.playerName; let i = $index) {
+                  <article class="hero-card" [class.center]="i === 1" [class.left]="i === 0" [class.right]="i === 2">
+                    <div class="hero-photo-wrap">
+                      <img class="hero-photo" [src]="p.playerImage" [alt]="p.playerName" loading="lazy" />
+                      <span class="hero-lvl">LV {{ p.level }}</span>
+                    </div>
+                    <div class="hero-meta">
+                      <h5 class="hero-name">{{ p.playerName }}</h5>
+                    </div>
+                  </article>
+                }
+              </div>
+
+              <button class="nav-btn next" type="button" (click)="next('A')" aria-label="Próximo">›</button>
+            </div>
+
+            <div class="team-total-level" [attr.title]="'Level do time: ' + teamStrengthA()">
+              <span class="stars" aria-label="Nível do time em estrelas">
+                @for (_ of teamStarsA(); track $index) {
+                  <span class="star" aria-hidden="true">★</span>
+                }
+              </span>
+            </div>
           </div>
-          <div class="team-summary">
-            <h4>Time B</h4>
-            <ul>
-              @for (p of teamB(); track $index) {
-                <li>{{ p.playerName }} · LV {{ p.level }} · {{ p.totalPoints }} pts</li>
-              }
-            </ul>
+
+          <!-- Versus estilizado -->
+          <div class="versus" aria-hidden="true"><span class="x-shape">X</span></div>
+
+          <!-- Lado B -->
+          <div class="team-side side-b">
+            <div class="team-head">
+              <h4 class="team-name">Time B</h4>
+            </div>
+
+            <!-- Carrossel Time B -->
+            <div class="team-carousel">
+              <button class="nav-btn prev" type="button" (click)="prev('B')" aria-label="Anterior">‹</button>
+
+              <div class="cards-rail" aria-live="polite">
+                @for (p of getTriplet('B'); track p.playerName; let i = $index) {
+                  <article class="hero-card" [class.center]="i === 1" [class.left]="i === 0" [class.right]="i === 2">
+                    <div class="hero-photo-wrap">
+                      <img class="hero-photo" [src]="p.playerImage" [alt]="p.playerName" loading="lazy" />
+                      <span class="hero-lvl">LV {{ p.level }}</span>
+                    </div>
+                    <div class="hero-meta">
+                      <h5 class="hero-name">{{ p.playerName }}</h5>
+                    </div>
+                  </article>
+                }
+              </div>
+
+              <button class="nav-btn next" type="button" (click)="next('B')" aria-label="Próximo">›</button>
+            </div>
+
+            <div class="team-total-level" [attr.title]="'Level do time: ' + teamStrengthB()">
+              <span class="stars" aria-label="Nível do time em estrelas">
+                @for (_ of teamStarsB(); track $index) {
+                  <span class="star" aria-hidden="true">★</span>
+                }
+              </span>
+            </div>
           </div>
         </div>
+
         <div class="actions">
           <button class="reset-btn" type="button" (click)="resetSelection()">Refazer seleção</button>
           <button class="start-btn" type="button" (click)="startGame()">Iniciar Jogo</button>
