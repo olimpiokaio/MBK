@@ -309,28 +309,6 @@
 .player-row .actions button { margin-left: 0.4rem; padding: 0.35rem 0.6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.55); background: rgba(0,0,0,0.28); color: var(--ice); cursor: pointer; }
 .player-row .actions button:hover { border-color: var(--gold-500); box-shadow: 0 0 0 2px rgba(255,196,0,0.15); }
 
-/* Modal styles */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: grid; place-items: center; z-index: 1000; }
-.modal-card { width: min(92vw, 420px); background: #101028; color: var(--ice); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 1rem; box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
-.modal-card h3 { margin: 0 0 0.4rem; }
-.modal-card p { margin: 0 0 0.8rem; opacity: 0.95; }
-
-/* Ajustes para o modal de pontuação mais intuitivo e legível */
-.adjust-modal { width: min(94vw, 520px); }
-.adjust-title { font-size: 1.4rem; letter-spacing: 0.5px; }
-.adjust-header { display: grid; grid-template-columns: 72px 1fr; gap: 0.8rem; align-items: center; margin: 0.4rem 0 0.8rem; }
-.adjust-header .avatar-sm { width: 72px; height: 72px; border-width: 3px; }
-.who { display: grid; gap: 0.2rem; align-items: center; }
-.team-chip { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; border: 1px solid rgba(255,255,255,0.6); font-weight: 700; font-size: 0.9rem; opacity: 0.95; }
-.player-name-strong { font-weight: 900; font-size: 1.4rem; letter-spacing: 0.6px; text-shadow: 0 2px 10px rgba(0,0,0,0.6); }
-.selected-points { font-size: 1.05rem; }
-
-.modal-actions { display: flex; gap: 0.8rem; justify-content: space-between; margin-top: 0.4rem; }
-.btn-sum, .btn-sub { flex: 1; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.4); cursor: pointer; color: var(--ice); font-weight: 800; font-size: 1.05rem; }
-.btn-sum { background: linear-gradient(135deg, rgba(54,211,106,0.25), rgba(109,61,255,0.15)); border-color: #36d36a; }
-.btn-sub { background: linear-gradient(135deg, rgba(209,0,80,0.15), rgba(109,61,255,0.12)); border-color: #d10050; }
-.btn-cancel { margin-top: 0.8rem; width: 100%; padding: 0.6rem 0.9rem; border-radius: 10px; background: transparent; border: 1px solid rgba(255,255,255,0.35); color: var(--ice); cursor: pointer; font-weight: 700; }
-.btn-cancel:hover { border-color: var(--gold-500); }
 
 .game-result { margin-top: 1rem; padding: 0.8rem; text-align: center; border-radius: 10px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.2); font-weight: 700; }
 
@@ -546,10 +524,6 @@
 }
 .stats-btn:hover { box-shadow: 0 0 0 2px rgba(109,61,255,0.25); }
 
-.stats-modal { width: min(94vw, 540px); text-align: center; }
-.stat-list { list-style: none; padding: 0; margin: 0 0 0.8rem; display: grid; gap: 0.4rem; }
-.stat-list li { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); padding: 0.5rem 0.6rem; border-radius: 10px; }
-.stat-list strong { color: var(--gold-500); margin-right: 0.35rem; }
 
 /* 2K25-like player card */
 .twoK-card { display: grid; place-items: center; margin: 0.6rem 0 0.8rem; }

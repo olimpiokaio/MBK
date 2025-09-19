@@ -1,0 +1,15 @@
+/* Modal styles specific to the stats modal component */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: grid; place-items: center; z-index: 1000; }
+.modal-card { width: min(92vw, 420px); background: #101028; color: var(--ice); border: 1px solid rgba(255,255,255,0.25); border-radius: 12px; padding: 1rem; box-shadow: 0 12px 30px rgba(0,0,0,0.5); }
+.modal-card h3 { margin: 0 0 0.4rem; }
+.modal-card p { margin: 0 0 0.8rem; opacity: 0.95; }
+
+/* Stats modal tweaks */
+.stats-modal { width: min(94vw, 540px); text-align: center; }
+.stat-list { list-style: none; padding: 0; margin: 0 0 0.8rem; display: grid; gap: 0.4rem; }
+.stat-list li { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); padding: 0.5rem 0.6rem; border-radius: 10px; }
+.stat-list strong { color: var(--gold-500); margin-right: 0.35rem; }
+
+/* Button */
+.btn-cancel { margin-top: 0.8rem; width: 100%; padding: 0.6rem 0.9rem; border-radius: 10px; background: transparent; border: 1px solid rgba(255,255,255,0.35); color: var(--ice); cursor: pointer; font-weight: 700; }
+.btn-cancel:hover { border-color: var(--gold-500); }

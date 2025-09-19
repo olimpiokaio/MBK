@@ -1,0 +1,29 @@
+@if (open) {
+  <div class="modal-overlay" (click)="onOverlayClick()">
+    <div class="modal-card stats-modal" (click)="stopProp($event)">
+      <h3>Estatísticas da Partida</h3>
+      <ul class="stat-list">
+        <li>
+          <strong>MVP:</strong>
+          @if (mvpPlayer) { {{ mvpPlayer!.playerName }} · {{ getPlayerMatchPoints(mvpPlayer!) }} pts } @else { — }
+        </li>
+        <li>
+          <strong>Maior Pontuador:</strong>
+          @if (topScorerPlayer) { {{ topScorerPlayer!.playerName }} · {{ getPlayerMatchPoints(topScorerPlayer!) }} pts } @else { — }
+        </li>
+      </ul>
+
+      @if (bestPlayer) {
+        <app-card-qualificacao
+          [player]="bestPlayer!"
+          [teamPlayers]="teamFor(bestPlayer!)"
+          [pointsRecord]="pointsRecord"
+          [animated]="true"
+        />
+      }
+      <h2>MVP</h2>
+
+      <button type="button" class="btn-cancel" (click)="close.emit()">Fechar</button>
+    </div>
+  </div>
+}
