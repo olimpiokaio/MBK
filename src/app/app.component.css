@@ -28,7 +28,7 @@
 
 .demo-modal {
   position: relative;
-  width: min(560px, 92vw);
+  width: min(560px, 80vw);
   color: #fff;
   border-radius: 1.25rem;
   padding: 2rem 1.5rem 1.5rem;
@@ -48,8 +48,8 @@
   top: -18px;
   left: 50%;
   transform: translateX(-50%);
-  width: 160px;
-  height: 36px;
+  width: 100px;
+  height: 30px;
   border-radius: 999px;
   background: linear-gradient(90deg, #6D3DFFFF, #D10050FF);
   box-shadow: 0 8px 24px rgba(109, 61, 255, 0.5), 0 8px 24px rgba(209, 0, 80, 0.4);

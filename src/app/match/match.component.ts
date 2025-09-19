@@ -11,11 +11,12 @@ import { TeamPlayersColumnComponent } from '../shared/team-players-column/team-p
 import { CardQualificacaoComponent } from '../shared/card-qualificacao/card-qualificacao.component';
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
 import { AdjustPointsModalComponent } from '../shared/adjust-points-modal/adjust-points-modal.component';
+import { StatsModalComponent } from '../shared/stats-modal/stats-modal.component';
 
 @Component({
   selector: 'app-match',
   standalone: true,
-  imports: [BackButtonComponent, TeamPlayersColumnComponent, CardQualificacaoComponent, LoadingSpinnerComponent, AdjustPointsModalComponent],
+  imports: [BackButtonComponent, TeamPlayersColumnComponent, CardQualificacaoComponent, LoadingSpinnerComponent, AdjustPointsModalComponent, StatsModalComponent],
   templateUrl: './match.component.html',
   styleUrl: './match.component.css'
 })
@@ -79,7 +80,7 @@ export class MatchComponent implements OnDestroy {
     if (this.allSelected()) {
       this.centerOnHighestLevel();
     }
-  });
+  }, { allowSignalWrites: true });
 
   prev(team: 'A' | 'B') {
     const list = team === 'A' ? this.sortedTeamA() : this.sortedTeamB();
@@ -191,6 +192,7 @@ export class MatchComponent implements OnDestroy {
       // Auto-advance to B when A completed and B not filled
       if (list.length === this.maxPerTeam && this.teamB().length < this.maxPerTeam) {
         this.selectedTeam.set('B');
+        this.scrollToTop();
       }
     } else {
       const list = this.teamB().slice();
@@ -204,8 +206,14 @@ export class MatchComponent implements OnDestroy {
       // If B completed and A incomplete, switch back to A
       if (list.length === this.maxPerTeam && this.teamA().length < this.maxPerTeam) {
         this.selectedTeam.set('A');
+        this.scrollToTop();
       }
     }
+  }
+
+  private scrollToTop() {
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    catch { try { window.scrollTo(0, 0); } catch {} }
   }
 
   resetSelection() {

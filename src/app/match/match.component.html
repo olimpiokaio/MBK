@@ -274,36 +274,17 @@
         </div>
       }
 
-      <!-- Modal Estatísticas -->
-      @if (statsOpen()) {
-        <div class="modal-overlay" (click)="closeStats()">
-          <div class="modal-card stats-modal" (click)="$event.stopPropagation()">
-            <h3>Estatísticas da Partida</h3>
-            <ul class="stat-list">
-              <li>
-                <strong>MVP:</strong>
-                @if (mvpPlayer()) { {{ mvpPlayer()!.playerName }} · {{ getPlayerMatchPoints(mvpPlayer()!) }} pts } @else { — }
-              </li>
-              <li>
-                <strong>Maior Pontuador:</strong>
-                @if (topScorerPlayer()) { {{ topScorerPlayer()!.playerName }} · {{ getPlayerMatchPoints(topScorerPlayer()!) }} pts } @else { — }
-              </li>
-            </ul>
-
-            @if (bestPlayer()) {
-              <app-card-qualificacao
-                [player]="bestPlayer()!"
-                [teamPlayers]="teamFor(bestPlayer()!)"
-                [pointsRecord]="playerPointsRecord()"
-                [animated]="true"
-              />
-            }
-            <h2>MVP</h2>
-
-            <button type="button" class="btn-cancel" (click)="closeStats()">Fechar</button>
-          </div>
-        </div>
-      }
+      <!-- Modal Estatísticas (componentizado) -->
+      <app-stats-modal
+        [open]="statsOpen()"
+        [mvpPlayer]="mvpPlayer()"
+        [topScorerPlayer]="topScorerPlayer()"
+        [bestPlayer]="bestPlayer()"
+        [teamFor]="teamFor.bind(this)"
+        [pointsRecord]="playerPointsRecord()"
+        [getPlayerMatchPoints]="getPlayerMatchPoints.bind(this)"
+        (close)="closeStats()"
+      />
 
       <!-- Modal para somar/diminuir pontos (componente) -->
       <app-adjust-points-modal
