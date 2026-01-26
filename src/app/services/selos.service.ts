@@ -1,33 +1,37 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+import { ProfileService } from './profile.service';
 
 /**
  * SelosService
  * Responsável por armazenar e consultar os selos (badges) conquistados pelo jogador atual
  * e alguns contadores auxiliares (vitórias consecutivas), utilizando localStorage.
+ *
+ * OBS: A referência ao nome do usuário no localStorage foi removida. Agora o nome
+ * vem do ProfileService (que lê do Firebase Realtime Database via AuthService).
  */
 @Injectable({ providedIn: 'root' })
 export class SelosService {
   private readonly STORAGE_KEY = 'mbk.selos.earned';
   private readonly WINS_STREAK_KEY = 'mbk.selos.winStreak';
-  private readonly CURRENT_PLAYER_KEY = 'mbk.currentPlayerName';
+
+  private profile = inject(ProfileService);
 
   /** Evento emitido quando um selo é conquistado pela primeira vez neste dispositivo. */
   private earnedSubject = new Subject<{ id: string; at: number }>();
   /** Observable público para que a UI possa reagir (ex.: mostrar animação estilo PlayStation). */
   readonly earned$: Observable<{ id: string; at: number }> = this.earnedSubject.asObservable();
 
-  /** Retorna o nome do jogador "atual" (salvo pela Home). */
+  /** Retorna o nome do jogador atual, derivado do ProfileService (Firebase). */
   get currentPlayerName(): string | null {
-    try { return localStorage.getItem(this.CURRENT_PLAYER_KEY); } catch { return null; }
+    const prof = this.profile.profile();
+    const name = prof.name?.trim();
+    return name ? name : null;
   }
 
-  /** Atualiza o jogador atual (pode ser chamado pela Home). */
+  /** Mantido por compatibilidade; não persiste mais em localStorage. */
   setCurrentPlayerName(name: string | null) {
-    try {
-      if (name && name.trim()) localStorage.setItem(this.CURRENT_PLAYER_KEY, name.trim());
-      else localStorage.removeItem(this.CURRENT_PLAYER_KEY);
-    } catch {}
+    // No-op: nome atual é derivado do ProfileService/AuthService
   }
 
   /** Lê o conjunto de selos conquistados. */

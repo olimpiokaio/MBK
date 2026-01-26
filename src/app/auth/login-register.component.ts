@@ -37,19 +37,18 @@ export class LoginRegisterComponent {
     this.successMsg = '';
   }
 
-  submitLogin() {
+  async submitLogin() {
     this.errorMsg = '';
-    const res = this.auth.login(this.identifier.trim(), this.loginPassword);
-    if (!res.ok) {
-      this.errorMsg = res.error;
-      return;
+    try {
+      await this.auth.login(this.identifier.trim(), this.loginPassword);
+      this.successMsg = 'Login realizado com sucesso!';
+      setTimeout(() => this.router.navigateByUrl('/'), 500);
+    } catch (e: any) {
+      this.errorMsg = this.mapError(e?.code || e?.message || 'Erro ao entrar');
     }
-    this.successMsg = 'Login realizado com sucesso!';
-    // redireciona para home
-    setTimeout(() => this.router.navigateByUrl('/'), 500);
   }
 
-  submitRegister() {
+  async submitRegister() {
     this.errorMsg = '';
 
     if (this.password.length < 6) {
@@ -61,19 +60,30 @@ export class LoginRegisterComponent {
       return;
     }
 
-    const res = this.auth.register({
-      email: this.email.trim(),
-      dob: this.dob,
-      username: this.username.trim(),
-      password: this.password,
-    });
-
-    if (!res.ok) {
-      this.errorMsg = res.error;
-      return;
+    try {
+      await this.auth.register({
+        email: this.email.trim(),
+        dob: this.dob,
+        username: this.username.trim(),
+        password: this.password,
+      });
+      this.successMsg = 'Cadastro realizado! Entrando...';
+      setTimeout(() => this.router.navigateByUrl('/'), 700);
+    } catch (e: any) {
+      this.errorMsg = this.mapError(e?.code || e?.message || 'Erro no cadastro');
     }
+  }
 
-    this.successMsg = 'Cadastro realizado! Entrando...';
-    setTimeout(() => this.router.navigateByUrl('/'), 700);
+  private mapError(code: string): string {
+    const map: Record<string, string> = {
+      'auth/email-already-in-use': 'E-mail já em uso',
+      'auth/invalid-email': 'E-mail inválido',
+      'auth/invalid-credential': 'Credenciais inválidas',
+      'auth/missing-password': 'Informe a senha',
+      'auth/weak-password': 'Senha muito fraca',
+      'auth/user-not-found': 'Usuário não encontrado',
+      'auth/wrong-password': 'Senha incorreta',
+    };
+    return map[code] || (typeof code === 'string' ? code : 'Erro de autenticação');
   }
 }

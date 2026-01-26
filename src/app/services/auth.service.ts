@@ -1,118 +1,114 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { Auth, User as FbUser, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from '@angular/fire/auth';
+import { Database, get, ref, set, update } from '@angular/fire/database';
 
 export type User = {
   email: string;
   dob: string; // ISO date string (yyyy-mm-dd)
   username: string;
-  password: string; // demo only (não use em produção)
   avatar?: string; // URL do avatar (opcional)
+  uid?: string; // id do firebase
 };
-
-const USERS_KEY = 'mbk.auth.users';
-const CURRENT_KEY = 'mbk.auth.current';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private usersSig = signal<User[]>(this.loadUsers());
-  private currentSig = signal<User | null>(this.loadCurrent());
+  private currentSig = signal<User | null>(null);
 
-  users = computed(() => this.usersSig());
   currentUser = computed(() => this.currentSig());
   isLoggedIn = computed(() => this.currentSig() !== null);
 
-  register(data: { email: string; dob: string; username: string; password: string }): { ok: true } | { ok: false; error: string } {
+  constructor(private auth: Auth, private db: Database) {
+    onAuthStateChanged(this.auth, (u) => {
+      this.hydrateFromFirebase(u).then(user => this.currentSig.set(user));
+    });
+  }
+
+  // Cadastro com e-mail/senha + campos extras
+  async register(data: { email: string; dob: string; username: string; password: string }): Promise<void> {
     const { email, dob, username, password } = data;
+    if (!email || !dob || !username || !password) throw new Error('Preencha todos os campos.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('E-mail inválido.');
+    if (password.length < 6) throw new Error('A senha deve ter no mínimo 6 caracteres.');
 
-    if (!email || !dob || !username || !password) {
-      return { ok: false, error: 'Preencha todos os campos.' };
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return { ok: false, error: 'E-mail inválido.' };
-    }
-    if (password.length < 6) {
-      return { ok: false, error: 'A senha deve ter no mínimo 6 caracteres.' };
-    }
+    const cred = await createUserWithEmailAndPassword(this.auth, email, password);
+    try { await updateProfile(cred.user, { displayName: username }); } catch {}
 
-    const users = this.usersSig();
-    if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-      return { ok: false, error: 'Já existe uma conta com este e-mail.' };
-    }
-    if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
-      return { ok: false, error: 'Já existe uma conta com este nome de usuário.' };
-    }
-
-    const newUser: User = { email, dob, username, password };
-    const next = [...users, newUser];
-    this.usersSig.set(next);
-    this.persistUsers(next);
-
-    // autentica automaticamente após cadastro
-    this.currentSig.set(newUser);
-    this.persistCurrent(newUser);
-
-    return { ok: true };
+    // Escreve perfil inicial no Realtime Database
+    const uid = cred.user.uid;
+    const profile: User = { email, dob, username, avatar: '', uid };
+    await set(ref(this.db, `users/${uid}`), {
+      email: profile.email,
+      username: profile.username,
+      dob: profile.dob,
+      avatar: profile.avatar || '',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+    // Inicializa nós padrão para stats e store
+    await set(ref(this.db, `users/${uid}/stats`), { level: 1, totalPoints: 0, coins: 0, updatedAt: Date.now() });
+    await set(ref(this.db, `users/${uid}/store`), { purchased: { backgrounds: {} }, applied: { background: null }, updatedAt: Date.now() });
+    // currentSig será atualizado pelo onAuthStateChanged
   }
 
-  login(identifier: string, password: string): { ok: true; user: User } | { ok: false; error: string } {
-    if (!identifier || !password) {
-      return { ok: false, error: 'Informe usuário/e-mail e senha.' };
-    }
-    const users = this.usersSig();
-    const idLower = identifier.toLowerCase();
-    const user = users.find(u => u.email.toLowerCase() === idLower || u.username.toLowerCase() === idLower);
-    if (!user || user.password !== password) {
-      return { ok: false, error: 'Credenciais inválidas.' };
-    }
+  async login(email: string, password: string): Promise<User> {
+    const cred = await signInWithEmailAndPassword(this.auth, email, password);
+    const user = await this.hydrateFromFirebase(cred.user);
     this.currentSig.set(user);
-    this.persistCurrent(user);
-    return { ok: true, user };
+    return user!;
   }
 
-  /** Atualiza o usuário logado e persiste em localStorage (lista e usuário atual). */
-  updateCurrentUser(partial: Partial<User>): void {
+  async logout(): Promise<void> {
+    await signOut(this.auth);
+    this.currentSig.set(null);
+  }
+
+  /** Atualiza o usuário logado e persiste no Realtime Database. */
+  async updateCurrentUser(partial: Partial<User>): Promise<void> {
     const curr = this.currentSig();
-    if (!curr) return;
+    if (!curr || !curr.uid) return;
     const updated: User = { ...curr, ...partial } as User;
     this.currentSig.set(updated);
-    this.persistCurrent(updated);
+    await update(ref(this.db, `users/${curr.uid}`), {
+      username: updated.username,
+      dob: updated.dob,
+      avatar: updated.avatar || '',
+      updatedAt: Date.now(),
+    });
+  }
 
-    const users = this.usersSig();
-    const idx = users.findIndex(u => u.email.toLowerCase() === curr.email.toLowerCase());
-    if (idx >= 0) {
-      const next = [...users];
-      next[idx] = updated;
-      this.usersSig.set(next);
-      this.persistUsers(next);
+  // Helpers
+  private async hydrateFromFirebase(u: FbUser | null): Promise<User | null> {
+    if (!u) return null;
+    const uid = u.uid;
+    const userRef = ref(this.db, `users/${uid}`);
+    const snap = await get(userRef);
+    if (!snap.exists()) {
+      // Inicializa perfil básico se não existir
+      const fallback: User = {
+        uid,
+        email: u.email || '',
+        username: u.displayName || (u.email?.split('@')[0] ?? ''),
+        dob: '2000-01-01',
+        avatar: ''
+      };
+      await set(userRef, {
+        email: fallback.email,
+        username: fallback.username,
+        dob: fallback.dob,
+        avatar: fallback.avatar,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+      return fallback;
     }
-  }
-
-  logout(): void {
-    this.currentSig.set(null);
-    try { localStorage.removeItem(CURRENT_KEY); } catch {}
-  }
-
-  private loadUsers(): User[] {
-    try {
-      const raw = localStorage.getItem(USERS_KEY);
-      return raw ? JSON.parse(raw) as User[] : [];
-    } catch { return []; }
-  }
-
-  private persistUsers(users: User[]) {
-    try { localStorage.setItem(USERS_KEY, JSON.stringify(users)); } catch {}
-  }
-
-  private loadCurrent(): User | null {
-    try {
-      const raw = localStorage.getItem(CURRENT_KEY);
-      return raw ? JSON.parse(raw) as User : null;
-    } catch { return null; }
-  }
-
-  private persistCurrent(user: User | null) {
-    try {
-      if (user) localStorage.setItem(CURRENT_KEY, JSON.stringify(user));
-      else localStorage.removeItem(CURRENT_KEY);
-    } catch {}
+    const val = snap.val() as any;
+    const profile: User = {
+      uid,
+      email: val.email || u.email || '',
+      username: val.username || u.displayName || (u.email?.split('@')[0] ?? ''),
+      dob: val.dob || '2000-01-01',
+      avatar: val.avatar || ''
+    };
+    return profile;
   }
 }

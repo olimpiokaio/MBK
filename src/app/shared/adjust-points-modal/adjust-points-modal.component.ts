@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import type { Player } from '../types/player.model';
 import { CommonModule } from '@angular/common';
 import { SelosService } from '../../services/selos.service';
+import { UserDataService } from '../../services/user-data.service';
 
 export type PendingAdjustAction = { team: 'A' | 'B'; player: Player; points: number };
 
@@ -21,7 +22,7 @@ export class AdjustPointsModalComponent {
   @Output() confirm = new EventEmitter<'sum' | 'sub'>();
   @Output() cancel = new EventEmitter<void>();
 
-  private readonly APPLIED_KEY_BASE = 'mbk.store.applied.background';
+  private userData = inject(UserDataService);
 
   constructor(private selos: SelosService) {}
 
@@ -34,13 +35,18 @@ export class AdjustPointsModalComponent {
       return null;
     }
 
-    const key = `${this.APPLIED_KEY_BASE}.${current}`;
-    try {
-      const id = localStorage.getItem(key);
-      return id ? `background-modal/${id}` : null;
-    } catch {
-      return null;
+    // Busca aplicada no Firebase (nota: é chamado durante render; para simplificar usamos getOnce síncrono via cache temporária)
+    // Em UI real, ideal seria tornar async com estado de carregamento.
+    let id: string | null = null;
+    try { id = (window as any).__mbkAppliedBgIdCache ?? null; } catch {}
+    // Se não houver cache, tentar carregar uma vez do Firebase e preencher cache para este ciclo
+    if (!id) {
+      this.userData.getAppliedBackgroundIdOnce().then(res => {
+        try { (window as any).__mbkAppliedBgIdCache = res || null; } catch {}
+      });
+      return null; // primeiro ciclo sem imagem; será atualizado no próximo detecção de mudanças
     }
+    return id ? `background-modal/${id}` : null;
   }
 
   onOverlayClick() {

@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { of, Observable } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { of, Observable, from } from 'rxjs';
+import { delay, map } from 'rxjs/operators';
 import { Player } from '../shared/types/player.model';
 import { AuthService } from './auth.service';
 import { ProfileService } from './profile.service';
+import { UserDataService } from './user-data.service';
 
 /**
  * PlayersService simula chamadas HTTP para buscar jogadores por comunidade.
@@ -13,6 +14,7 @@ import { ProfileService } from './profile.service';
 export class PlayersService {
   private auth = inject(AuthService);
   private profile = inject(ProfileService);
+  private userData = inject(UserDataService);
 
   // Dados mockados: jogadores por id de comunidade
   private readonly playersByCommunity: Record<string, Player[]> = {
@@ -69,37 +71,25 @@ export class PlayersService {
   /** Retorna jogadores da comunidade simulando uma chamada HTTP. */
   getPlayersByCommunity(communityId: string): Observable<Player[]> {
     const base = this.playersByCommunity[communityId] ?? [];
-    let players = [...base];
-
-    // Se houver usuário logado, garantir que ele pertença à comunidade "colegas samambaia norte" (id '1')
-    if (communityId === '1') {
-      const user = this.auth.currentUser();
-      if (user) {
-        const username = user.username;
-        const age = this.calcAge(user.dob);
-        const { level, totalPoints } = this.loadStats(username);
-        const prof = this.profile.profile();
-        const name = prof.name || username;
-        const avatar = prof.avatar || 'https://i.pinimg.com/originals/a4/0a/db/a40adbb4e98486e06a57bc75c4b06600.jpg';
-        const me = new Player(name, avatar, age, level, totalPoints);
-
-        const idx = players.findIndex(p => p.playerName.toLowerCase() === name.toLowerCase());
-        if (idx >= 0) players[idx] = me; else players.unshift(me);
-      }
-    }
-
-    return of(players).pipe(delay(600));
+    return from(this.userData.getStatsOnce()).pipe(
+      delay(600),
+      map(stats => this.buildPlayersWithStats(base, stats, communityId))
+    );
   }
 
-  private loadStats(username: string): { level: number; totalPoints: number } {
-    try {
-      const raw = localStorage.getItem(`mbk.stats.${username}`);
-      if (raw) {
-        const obj = JSON.parse(raw) as { level?: number; totalPoints?: number };
-        return { level: obj.level ?? 1, totalPoints: obj.totalPoints ?? 0 };
-      }
-    } catch {}
-    return { level: 1, totalPoints: 0 };
+  private buildPlayersWithStats(base: Player[], stats: { level: number; totalPoints: number }, communityId: string): Player[] {
+    let players = [...base];
+    const user = this.auth.currentUser();
+    if (user && communityId === '1') {
+      const prof = this.profile.profile();
+      const name = prof.name || user.username;
+      const avatar = prof.avatar || 'https://i.pinimg.com/originals/a4/0a/db/a40adbb4e98486e06a57bc75c4b06600.jpg';
+      const age = this.calcAge(user.dob);
+      const me = new Player(name, avatar, age, stats.level ?? 1, stats.totalPoints ?? 0);
+      const idx = players.findIndex(p => p.playerName.toLowerCase() === name.toLowerCase());
+      if (idx >= 0) players[idx] = me; else players.unshift(me);
+    }
+    return players;
   }
 
   private calcAge(dobIso: string): number {

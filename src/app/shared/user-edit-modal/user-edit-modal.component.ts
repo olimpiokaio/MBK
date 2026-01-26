@@ -29,9 +29,7 @@ export class UserEditModalComponent {
     if (!name) {
       return;
     }
-    try {
-      localStorage.setItem('mbk.profile.override', JSON.stringify({ name, avatar: avatarUrl }));
-    } catch {}
+    // Agora quem persiste é o HomeComponent/ProfileService -> Realtime Database
     this.save.emit({ playerName: name, avatarUrl });
   }
 
