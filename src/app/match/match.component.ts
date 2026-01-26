@@ -12,6 +12,7 @@ import { CardQualificacaoComponent } from '../shared/card-qualificacao/card-qual
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
 import { AdjustPointsModalComponent } from '../shared/adjust-points-modal/adjust-points-modal.component';
 import { StatsModalComponent } from '../shared/stats-modal/stats-modal.component';
+import { ProfileService } from '../services/profile.service';
 
 @Component({
   selector: 'app-match',
@@ -28,6 +29,7 @@ export class MatchComponent implements OnDestroy {
   private selos = inject(SelosService);
   // Coins
   private coins = inject(CoinService);
+  private profile = inject(ProfileService);
 
   // Loading state
   loadingPlayers = signal<boolean>(true);
@@ -146,6 +148,29 @@ export class MatchComponent implements OnDestroy {
         this.loadingPlayers.set(false);
       }
     });
+
+    // Reagir a alterações de perfil (nome/avatar) antes do jogo começar
+    effect(() => {
+      const p = this.profile.profile();
+      // access values to establish dependency
+      const name = p.name;
+      const avatar = p.avatar;
+      // Se o jogo ainda não começou, recarrega a lista de jogadores da comunidade
+      if (!this.gameStarted()) {
+        const cid = this.communityId();
+        if (!cid) return;
+        this.loadingPlayers.set(true);
+        this.playersService.getPlayersByCommunity(cid).subscribe({
+          next: (list) => {
+            this.players.set(list);
+            this.loadingPlayers.set(false);
+          },
+          error: () => {
+            this.loadingPlayers.set(false);
+          }
+        });
+      }
+    }, { allowSignalWrites: true });
   }
 
   chooseTeam(team: 'A' | 'B') {

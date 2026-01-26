@@ -1,10 +1,15 @@
-
-
 <header class="app-header" [class.faded]="faded" (mouseenter)="onInteract()">
   <a class="logo" routerLink="/" aria-label="Ir para a página inicial" title="Início">
     <img src="mbk-icon.png" alt="Logo" />
   </a>
-  <div class="controls">
+  <nav class="controls">
+
+  <ng-container *ngIf="user() as u">
+    <button class="nav-link btn-link" (click)="onLogout()" title="Sair">Sair</button>
+    <span class="welcome">Olá, {{ displayName() }}</span>
+  </ng-container>
+
+  <ng-container *ngIf="!isLogin">
     <button class="icon-btn" (click)="onTogglePlay()" aria-label="Pausar ou retomar música de fundo" title="Pausar/Retomar">
       <span *ngIf="!isPaused" aria-hidden="true">⏸</span>
       <span *ngIf="isPaused" aria-hidden="true">▶</span>
@@ -12,5 +17,6 @@
     <button class="icon-btn" (click)="onNext()" aria-label="Próxima música" title="Próxima">
       <span aria-hidden="true">⏭</span>
     </button>
-  </div>
+  </ng-container>
+</nav>
 </header>

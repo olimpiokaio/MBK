@@ -92,7 +92,19 @@ export class StatisticsService {
       }
     }
 
+    // 5) Persistir stats por jogador (para refletir na Home)
+    for (const p of this.playersInMatch) {
+      this.persistStats(p.playerName, p.level, p.totalPoints);
+    }
+
     // marcar como finalizado
     this.started = false;
+  }
+
+  private persistStats(username: string, level: number, totalPoints: number): void {
+    try {
+      const data = { level, totalPoints };
+      localStorage.setItem(`mbk.stats.${username}`, JSON.stringify(data));
+    } catch {}
   }
 }

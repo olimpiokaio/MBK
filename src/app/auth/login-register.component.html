@@ -1,0 +1,51 @@
+<section class="auth">
+  <h1>{{ mode() === 'login' ? 'Entrar' : 'Criar conta' }}</h1>
+
+  <button class="toggle" (click)="toggleMode()">
+    {{ mode() === 'login' ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Entrar' }}
+  </button>
+
+  <div class="card">
+    <form *ngIf="mode() === 'login'; else registerTpl" (ngSubmit)="submitLogin()">
+      <label>
+        E-mail ou usuário
+        <input name="identifier" [(ngModel)]="identifier" placeholder="email@exemplo.com ou usuario" required>
+      </label>
+      <label>
+        Senha
+        <input type="password" name="password" [(ngModel)]="loginPassword" minlength="6" required>
+      </label>
+      <div class="error" *ngIf="errorMsg">{{ errorMsg }}</div>
+      <div class="success" *ngIf="successMsg">{{ successMsg }}</div>
+      <button type="submit" class="primary">Entrar</button>
+    </form>
+
+    <ng-template #registerTpl>
+      <form (ngSubmit)="submitRegister()">
+        <label>
+          E-mail
+          <input type="email" name="email" [(ngModel)]="email" required>
+        </label>
+        <label>
+          Data de nascimento
+          <input type="date" name="dob" [(ngModel)]="dob" required>
+        </label>
+        <label>
+          Nome de usuário
+          <input name="username" [(ngModel)]="username" required>
+        </label>
+        <label>
+          Senha (mínimo 6)
+          <input type="password" name="password" [(ngModel)]="password" minlength="6" required>
+        </label>
+        <label>
+          Confirmar senha
+          <input type="password" name="confirmPassword" [(ngModel)]="confirmPassword" minlength="6" required>
+        </label>
+        <div class="error" *ngIf="errorMsg">{{ errorMsg }}</div>
+        <div class="success" *ngIf="successMsg">{{ successMsg }}</div>
+        <button type="submit" class="primary">Cadastrar</button>
+      </form>
+    </ng-template>
+  </div>
+</section>

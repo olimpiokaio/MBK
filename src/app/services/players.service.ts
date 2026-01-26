@@ -1,7 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { of, Observable } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { Player } from '../shared/types/player.model';
+import { AuthService } from './auth.service';
+import { ProfileService } from './profile.service';
 
 /**
  * PlayersService simula chamadas HTTP para buscar jogadores por comunidade.
@@ -9,6 +11,9 @@ import { Player } from '../shared/types/player.model';
  */
 @Injectable({ providedIn: 'root' })
 export class PlayersService {
+  private auth = inject(AuthService);
+  private profile = inject(ProfileService);
+
   // Dados mockados: jogadores por id de comunidade
   private readonly playersByCommunity: Record<string, Player[]> = {
     '1': [
@@ -63,7 +68,46 @@ export class PlayersService {
 
   /** Retorna jogadores da comunidade simulando uma chamada HTTP. */
   getPlayersByCommunity(communityId: string): Observable<Player[]> {
-    const players = this.playersByCommunity[communityId] ?? [];
+    const base = this.playersByCommunity[communityId] ?? [];
+    let players = [...base];
+
+    // Se houver usuário logado, garantir que ele pertença à comunidade "colegas samambaia norte" (id '1')
+    if (communityId === '1') {
+      const user = this.auth.currentUser();
+      if (user) {
+        const username = user.username;
+        const age = this.calcAge(user.dob);
+        const { level, totalPoints } = this.loadStats(username);
+        const prof = this.profile.profile();
+        const name = prof.name || username;
+        const avatar = prof.avatar || 'https://i.pinimg.com/originals/a4/0a/db/a40adbb4e98486e06a57bc75c4b06600.jpg';
+        const me = new Player(name, avatar, age, level, totalPoints);
+
+        const idx = players.findIndex(p => p.playerName.toLowerCase() === name.toLowerCase());
+        if (idx >= 0) players[idx] = me; else players.unshift(me);
+      }
+    }
+
     return of(players).pipe(delay(600));
+  }
+
+  private loadStats(username: string): { level: number; totalPoints: number } {
+    try {
+      const raw = localStorage.getItem(`mbk.stats.${username}`);
+      if (raw) {
+        const obj = JSON.parse(raw) as { level?: number; totalPoints?: number };
+        return { level: obj.level ?? 1, totalPoints: obj.totalPoints ?? 0 };
+      }
+    } catch {}
+    return { level: 1, totalPoints: 0 };
+  }
+
+  private calcAge(dobIso: string): number {
+    const dob = new Date(dobIso);
+    const now = new Date();
+    let age = now.getFullYear() - dob.getFullYear();
+    const m = now.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age--;
+    return Math.max(0, age);
   }
 }

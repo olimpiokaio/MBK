@@ -1,0 +1,20 @@
+section.auth { max-width: 520px; margin: 2rem auto; padding: 0 1rem; color: #fff; font-family: 'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+
+h1 { text-align: center; margin-bottom: 0.75rem; }
+
+.toggle { display: block; margin: 0 auto 1rem; background: transparent; color: #ddd; border: 1px solid rgba(255,255,255,0.25); padding: 0.5rem 0.75rem; border-radius: 8px; cursor: pointer; }
+
+.card { background: rgba(20,12,40,0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem; box-shadow: 0 10px 20px rgba(0,0,0,0.25); }
+
+form { display: grid; gap: 0.75rem; }
+
+label { display: grid; gap: 0.25rem; font-size: 0.95rem; }
+
+input { padding: 0.6rem 0.75rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; }
+
+.primary { margin-top: 0.5rem; padding: 0.7rem 1rem; border: 0; border-radius: 10px; background: linear-gradient(135deg, #6D3DFF, #D10050); color: #fff; font-weight: 700; letter-spacing: 0.3px; cursor: pointer; }
+
+.error { color: #ff6b6b; background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.3); padding: 0.5rem 0.75rem; border-radius: 8px; }
+.success { color: #51cf66; background: rgba(81,207,102,0.08); border: 1px solid rgba(81,207,102,0.3); padding: 0.5rem 0.75rem; border-radius: 8px; }
+
+.back { display: inline-block; margin-top: 1rem; color: #ddd; }

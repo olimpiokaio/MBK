@@ -7,8 +7,13 @@
 <div class="container-home">
   <div class="content-card">
     <h2 class="content-card-title">MBK</h2>
-    <app-card-play [player]="player" />
+    <app-card-play [player]="player" (cardClick)="openEdit()" />
   </div>
+
+  <app-user-edit-modal *ngIf="isEditOpen"
+                       [player]="player"
+                       (save)="onPlayerSave($event)"
+                       (close)="isEditOpen=false"></app-user-edit-modal>
 
   <div>
     <div class="container-play-legacy">

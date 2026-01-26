@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 
@@ -26,6 +26,7 @@ export class AppComponent {
   private sanitizer = inject(DomSanitizer);
   private selos = inject(SelosService);
   private coins = inject(CoinService);
+  private router = inject(Router);
 
   // Iframe element reference
   @ViewChild('bgPlayer') bgPlayer?: ElementRef<HTMLIFrameElement>;
@@ -117,29 +118,58 @@ export class AppComponent {
       this.postToPlayer({ event: 'command', func: 'playVideo', args: [] });
     }, 200);
 
-    // Bind a one-time activation on first user gesture to comply with autoplay policies
-    if (!this.listenerBound) {
-      this.listenerBound = true;
-      const activate = () => {
-        this.activateAudio();
-        // Remove listeners after activation
-        document.removeEventListener('click', activate);
-        document.removeEventListener('touchstart', activate);
-        document.removeEventListener('pointerdown', activate);
-        document.removeEventListener('keydown', activate);
-      };
-      document.addEventListener('click', activate, { passive: true, once: true });
-      document.addEventListener('touchstart', activate, { passive: true, once: true });
-      document.addEventListener('pointerdown', activate, { passive: true, once: true });
-      document.addEventListener('keydown', activate, { once: true });
-    }
+    const bindIfAllowed = () => {
+      if (!this.isOnLoginRoute() && !this.listenerBound) {
+        this.bindActivationListeners();
+      }
+    };
 
-    // If the tab becomes visible again, ensure playback resumes
+    // Bind activation listeners only if not on login route
+    bindIfAllowed();
+
+    // React to route changes: pause/mute on login, allow activation on other routes
+    this.router.events.subscribe(ev => {
+      if (ev instanceof NavigationEnd) {
+        if (this.isOnLoginRoute()) {
+          // Ensure audio is paused and muted on login screen
+          this.postToPlayer({ event: 'command', func: 'mute', args: [] });
+          this.postToPlayer({ event: 'command', func: 'pauseVideo', args: [] });
+        } else {
+          bindIfAllowed();
+        }
+      }
+    });
+
+    // If the tab becomes visible again, ensure playback resumes (only outside login)
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
+      if (!document.hidden && !this.isOnLoginRoute()) {
         this.postToPlayer({ event: 'command', func: 'playVideo', args: [] });
       }
     });
+  }
+
+  private isOnLoginRoute(): boolean {
+    const url = this.router.url || '';
+    return url.startsWith('/login');
+  }
+
+  private bindActivationListeners() {
+    this.listenerBound = true;
+    const activate = () => {
+      // Do not activate audio from the login screen
+      if (!this.isOnLoginRoute()) {
+        this.activateAudio();
+      }
+      // Remove listeners after activation
+      document.removeEventListener('click', activate);
+      document.removeEventListener('touchstart', activate);
+      document.removeEventListener('pointerdown', activate);
+      document.removeEventListener('keydown', activate);
+    };
+    document.addEventListener('click', activate, { passive: true, once: true });
+    document.addEventListener('touchstart', activate, { passive: true, once: true });
+    document.addEventListener('pointerdown', activate, { passive: true, once: true });
+    document.addEventListener('keydown', activate, { once: true });
   }
 
   private postToPlayer(message: any) {
