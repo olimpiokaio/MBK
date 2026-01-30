@@ -67,9 +67,11 @@ export class MbkStoreComponent implements OnDestroy, AfterViewInit {
   private appliedId: string | null = null;
 
   constructor(private coins: CoinService, private selos: SelosService, private userData: UserDataService) {
-    this.balance = this.coins.getBalance();
-    this.displayBalance = this.balance;
+    // Não ler saldo síncrono aqui - aguardar o observable carregar do Firebase
     this.sub = this.coins.balanceObservable.subscribe(v => {
+      // Ignora valores null (ainda não carregado do Firebase)
+      if (v === null) return;
+
       const prevDisplay = this.displayBalance;
       this.balance = v;
       // Anima somente quando diminuir (compra), senão atualiza direto

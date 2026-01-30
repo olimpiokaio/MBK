@@ -56,13 +56,6 @@ export class UserDataService {
     return totalPoints;
   }
 
-  async addCoins(delta: number): Promise<number> {
-    const stats = await this.getStatsOnce();
-    const coins = Math.max(0, (stats.coins || 0) + Math.floor(delta || 0));
-    await this.updateStats({ coins });
-    return coins;
-  }
-
   // ====== STORE (BACKGROUND) ======
   async getStoreOnce(): Promise<UserStore> {
     const uid = this.uid();

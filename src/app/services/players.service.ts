@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { of, Observable, from } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 import { Player } from '../shared/types/player.model';
 import { AuthService } from './auth.service';
