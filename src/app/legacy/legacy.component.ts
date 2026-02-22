@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
 import { SeloComponent } from '../shared/selo/selo.component';
@@ -21,8 +21,13 @@ type SeloFilter = 'all' | 'earned' | 'not-earned';
   styleUrl: './legacy.component.css'
 })
 export class LegacyComponent {
-  constructor(private selosService: SelosService) {
-    this.refreshEarned();
+  private selosService = inject(SelosService);
+
+  constructor() {
+    effect(() => {
+      const earned = this.selosService.earned();
+      this.selos = this.selos.map(s => ({ ...s, earned: earned.has(s.id) }));
+    });
   }
   // List of available selos. When integrating with backend, toggle `earned` to true to show in color.
   selos: Selo[] = [
@@ -70,11 +75,6 @@ export class LegacyComponent {
 
   closeOverlay() {
     this.selectedSelo = null;
-  }
-
-  private refreshEarned() {
-    const earned = this.selosService.getEarned();
-    this.selos = this.selos.map(s => ({ ...s, earned: earned.has(s.id) }));
   }
 
   getSeloDescription(id: string): string {

@@ -47,6 +47,7 @@ export class AuthService {
     // Inicializa nós padrão para stats e store
     await set(ref(this.db, `users/${uid}/stats`), { level: 1, totalPoints: 0, coins: 0, updatedAt: Date.now() });
     await set(ref(this.db, `users/${uid}/store`), { purchased: { backgrounds: {} }, applied: { background: null }, updatedAt: Date.now() });
+    await set(ref(this.db, `users/${uid}/achievements`), { earned: {}, winStreak: 0, updatedAt: Date.now() });
     // currentSig será atualizado pelo onAuthStateChanged
   }
 
