@@ -13,7 +13,10 @@
   </header>
 
   <section class="store-content">
-    <div class="carousel-wrapper">
+    <div class="loading-container" *ngIf="!storeLoaded">
+      <p>Carregando loja...</p>
+    </div>
+    <div class="carousel-wrapper" *ngIf="storeLoaded">
       <div class="carousel" #carouselContainer>
         <div class="carousel-track" #carouselTrack>
           <div class="slide" *ngFor="let item of items; let i = index" [class.applied]="isApplied(item)">

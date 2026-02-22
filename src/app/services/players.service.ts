@@ -71,13 +71,21 @@ export class PlayersService {
   /** Retorna jogadores da comunidade simulando uma chamada HTTP. */
   getPlayersByCommunity(communityId: string): Observable<Player[]> {
     const base = this.playersByCommunity[communityId] ?? [];
-    return from(this.userData.getStatsOnce()).pipe(
+    return from(Promise.all([
+      this.userData.getStatsOnce(),
+      this.userData.getStoreOnce()
+    ])).pipe(
       delay(600),
-      map(stats => this.buildPlayersWithStats(base, stats, communityId))
+      map(([stats, store]) => this.buildPlayersWithStats(base, stats, store, communityId))
     );
   }
 
-  private buildPlayersWithStats(base: Player[], stats: { level: number; totalPoints: number }, communityId: string): Player[] {
+  private buildPlayersWithStats(
+    base: Player[],
+    stats: { level: number; totalPoints: number },
+    store: any,
+    communityId: string
+  ): Player[] {
     let players = [...base];
     const user = this.auth.currentUser();
     if (user && communityId === '1') {
@@ -85,7 +93,13 @@ export class PlayersService {
       const name = prof.name || user.username;
       const avatar = prof.avatar || 'https://i.pinimg.com/originals/a4/0a/db/a40adbb4e98486e06a57bc75c4b06600.jpg';
       const age = this.calcAge(user.dob);
-      const me = new Player(name, avatar, age, stats.level ?? 1, stats.totalPoints ?? 0);
+
+      let background = null;
+      if (store?.applied?.background) {
+        background = `background-modal/${store.applied.background}.gif`;
+      }
+
+      const me = new Player(name, avatar, age, stats.level ?? 1, stats.totalPoints ?? 0, background);
       const idx = players.findIndex(p => p.playerName.toLowerCase() === name.toLowerCase());
       if (idx >= 0) players[idx] = me; else players.unshift(me);
     }

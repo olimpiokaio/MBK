@@ -24,6 +24,8 @@ export class MbkStoreComponent implements OnDestroy, AfterViewInit {
   displayBalance = 0;
   // Flag para classe de animação visual ao gastar
   spendingPulse = false;
+  // Flag para indicar se os dados da loja foram carregados do Firebase
+  storeLoaded = false;
   private sub?: Subscription;
 
   readonly COST = 10;
@@ -61,7 +63,7 @@ export class MbkStoreComponent implements OnDestroy, AfterViewInit {
     'the-nyan-cat.gif',
     'trikey-drama.gif',
     'wawa.gif',
-  ].map((file) => ({ id: file, name: file.replace('.gif',''), src: `background-modal/${file}`, cost: this.COST }));
+  ].map((file) => ({ id: file.replace('.gif',''), name: file.replace('.gif',''), src: `background-modal/${file}`, cost: this.COST }));
 
   private purchasedSet = new Set<string>();
   private appliedId: string | null = null;
@@ -91,7 +93,14 @@ export class MbkStoreComponent implements OnDestroy, AfterViewInit {
       const store = await this.userData.getStoreOnce();
       this.purchasedSet = new Set<string>(Object.keys(store.purchased.backgrounds || {}));
       this.appliedId = store.applied.background ?? null;
-    } catch {}
+    } catch {
+      // Em caso de erro, inicializa com valores vazios
+      this.purchasedSet = new Set<string>();
+      this.appliedId = null;
+    } finally {
+      // Marca como carregado independentemente de sucesso ou erro
+      this.storeLoaded = true;
+    }
   }
 
   isPurchased(item: StoreItem): boolean {
@@ -104,10 +113,17 @@ export class MbkStoreComponent implements OnDestroy, AfterViewInit {
 
   async buy(item: StoreItem) {
     if (!this.canBuy(item)) return;
-    this.coins.addCoins(-item.cost);
-    this.purchasedSet.add(item.id);
-    try { await this.userData.purchaseBackground(item.id); } catch {}
-    this.triggerSpendPulse();
+    try {
+      // Primeiro tenta gravar no Firebase
+      await this.userData.purchaseBackground(item.id);
+      // Só atualiza estado local e deduz moedas se gravação foi bem-sucedida
+      this.purchasedSet.add(item.id);
+      this.coins.addCoins(-item.cost);
+      this.triggerSpendPulse();
+    } catch (error) {
+      console.error('Erro ao comprar item:', error);
+      // Poderia mostrar mensagem de erro ao usuário aqui
+    }
   }
 
   // === APLICAR/REMOVER BG ===

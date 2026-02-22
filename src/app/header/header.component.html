@@ -1,22 +1,42 @@
 <header class="app-header" [class.faded]="faded" (mouseenter)="onInteract()">
-  <a class="logo" routerLink="/" aria-label="Ir para a página inicial" title="Início">
+  <a *ngIf="!matchService.isInMatch()" class="logo" routerLink="/" aria-label="Ir para a página inicial" title="Início">
     <img src="mbk-icon.png" alt="Logo" />
   </a>
+
+  <div class="center-action">
+    <ng-container *ngIf="user() as u; else noUser">
+      <button *ngIf="!isLogin && !matchService.isInMatch()" class="logout-btn" (click)="onLogout()" title="Sair">
+        <span class="btn-text">SAIR</span>
+        <span class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </span>
+      </button>
+    </ng-container>
+    <ng-template #noUser></ng-template>
+  </div>
+
   <nav class="controls">
-
-  <ng-container *ngIf="user() as u">
-    <button class="nav-link btn-link" (click)="onLogout()" title="Sair">Sair</button>
-    <span class="welcome">Olá, {{ displayName() }}</span>
-  </ng-container>
-
-  <ng-container *ngIf="!isLogin">
-    <button class="icon-btn" (click)="onTogglePlay()" aria-label="Pausar ou retomar música de fundo" title="Pausar/Retomar">
-      <span *ngIf="!isPaused" aria-hidden="true">⏸</span>
-      <span *ngIf="isPaused" aria-hidden="true">▶</span>
-    </button>
-    <button class="icon-btn" (click)="onNext()" aria-label="Próxima música" title="Próxima">
-      <span aria-hidden="true">⏭</span>
-    </button>
-  </ng-container>
-</nav>
+    <ng-container *ngIf="!isLogin">
+      <button class="icon-btn" (click)="onPrevious()" aria-label="Música anterior" title="Anterior">
+        <span aria-hidden="true">⏮</span>
+      </button>
+      <button class="icon-btn" (click)="onTogglePlay()" aria-label="Pausar ou retomar música de fundo" title="Pausar/Retomar">
+        <span *ngIf="!isPaused" aria-hidden="true">⏸</span>
+        <span *ngIf="isPaused" aria-hidden="true">▶</span>
+      </button>
+      <button class="icon-btn" (click)="onNext()" aria-label="Próxima música" title="Próxima">
+        <span aria-hidden="true">⏭</span>
+      </button>
+    </ng-container>
+  </nav>
 </header>
+
+<app-logout-modal
+  [open]="showLogoutModal"
+  (confirm)="confirmLogout()"
+  (cancel)="cancelLogout()"
+></app-logout-modal>

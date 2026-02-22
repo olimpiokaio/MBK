@@ -46,7 +46,7 @@ export class AdjustPointsModalComponent {
       });
       return null; // primeiro ciclo sem imagem; será atualizado no próximo detecção de mudanças
     }
-    return id ? `background-modal/${id}` : null;
+    return id ? `background-modal/${id}.gif` : null;
   }
 
   onOverlayClick() {

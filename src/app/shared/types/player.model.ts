@@ -5,7 +5,8 @@ export class Player {
     public playerImage: string,
     public age: number,
     public level: number,
-    public totalPoints: number
+    public totalPoints: number,
+    public activeBackground?: string | null
   ) {}
 
   // Method to display player information

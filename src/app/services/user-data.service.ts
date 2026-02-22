@@ -76,7 +76,7 @@ export class UserDataService {
   async purchaseBackground(id: string): Promise<void> {
     const uid = this.uid();
     if (!uid || !id) return;
-    await update(ref(this.db, `users/${uid}/store/purchased/backgrounds/${id}`), true as any);
+    await set(ref(this.db, `users/${uid}/store/purchased/backgrounds/${id}`), true);
   }
 
   async applyBackground(id: string | null): Promise<void> {

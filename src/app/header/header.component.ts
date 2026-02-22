@@ -3,18 +3,20 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { BackgroundMusicService } from '../services/background-music.service';
 import { AuthService } from '../services/auth.service';
-import { ProfileService } from '../services/profile.service';
+import { LogoutModalComponent } from '../shared/logout-modal/logout-modal.component';
+import { MatchService } from '../services/match.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, LogoutModalComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
 export class HeaderComponent implements OnDestroy {
   faded = false; // controls slight visibility state
   isPaused = false; // UI state for play/pause toggle
+  showLogoutModal = false;
 
   private idleTimer?: any;
   private readonly idleMs = 8000; // 8 seconds
@@ -22,10 +24,9 @@ export class HeaderComponent implements OnDestroy {
   private music = inject(BackgroundMusicService);
   auth = inject(AuthService);
   private router = inject(Router);
-  private profile = inject(ProfileService);
+  matchService = inject(MatchService);
 
   user = this.auth.currentUser;
-  displayName = computed(() => this.profile.profile().name || (this.auth.currentUser()?.username ?? ''));
 
   // Track if current route is home ('/')
   isHome = false;
@@ -65,11 +66,26 @@ export class HeaderComponent implements OnDestroy {
     this.onInteract();
   }
 
+  onPrevious() {
+    this.music.previous();
+    this.isPaused = this.music.isPaused();
+    this.onInteract();
+  }
+
   onLogout() {
+    this.showLogoutModal = true;
+    this.onInteract();
+  }
+
+  confirmLogout() {
+    this.showLogoutModal = false;
     // Realiza logout e redireciona para a tela de login
     this.auth.logout();
     try { this.router.navigateByUrl('/login'); } catch {}
-    this.onInteract();
+  }
+
+  cancelLogout() {
+    this.showLogoutModal = false;
   }
 
   // Called on any interaction with the header (mouse move, click, focus, touch)
