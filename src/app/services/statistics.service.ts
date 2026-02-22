@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Player } from '../shared/types/player.model';
+import { ProfileService } from './profile.service';
+import { UserDataService } from './user-data.service';
 
 /**
  * StatisticsService
@@ -13,6 +15,8 @@ import { Player } from '../shared/types/player.model';
  */
 @Injectable({ providedIn: 'root' })
 export class StatisticsService {
+  private profile = inject(ProfileService);
+  private userData = inject(UserDataService);
   private started = false;
 
   private playersInMatch: Player[] = [];
@@ -60,7 +64,7 @@ export class StatisticsService {
    *  - Perdedor perde -1 level (não abaixo de 0)
    *  - Em caso de empate, não há vencedores nem perdedores
    */
-  finalizeAndApply(): void {
+  async finalizeAndApply(): Promise<void> {
     if (!this.started) return;
 
     const winnersSet = new Set(this.winnersList.map(p => p.playerName));
@@ -92,7 +96,26 @@ export class StatisticsService {
       }
     }
 
+    // 5) Persistir stats do jogador atual no Firebase
+    try {
+      const me = this.playersInMatch.find(p => p.playerName === this.currentPlayerName());
+      if (me) {
+        await this.userData.updateStats({ level: me.level, totalPoints: me.totalPoints });
+      }
+    } catch {}
+
     // marcar como finalizado
     this.started = false;
+  }
+
+  // Helpers
+  private currentPlayerName(): string | null {
+    try {
+      // evita import circular; usa ProfileService para obter nome derivado do usuário atual
+      const prof = this.profile.profile();
+      return prof.name || null;
+    } catch {
+      return null;
+    }
   }
 }

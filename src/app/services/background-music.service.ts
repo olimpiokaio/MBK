@@ -57,6 +57,16 @@ export class BackgroundMusicService {
     this.paused = false;
   }
 
+  previous() {
+    // For a playlist, previousVideo goes back to the previous track
+    this.post({ event: 'command', func: 'previousVideo', args: [] });
+    // After skipping, ensure it is playing, unmuted and at the desired volume
+    this.post({ event: 'command', func: 'unMute', args: [] });
+    this.post({ event: 'command', func: 'setVolume', args: [this.currentVolume] });
+    this.post({ event: 'command', func: 'playVideo', args: [] });
+    this.paused = false;
+  }
+
   isPaused(): boolean {
     return this.paused;
   }

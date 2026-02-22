@@ -354,3 +354,15 @@
 
 /* Wrapper for fixed nav buttons overlaying the scroll area */
 .carousel-wrapper { position: relative; }
+
+/* Loading container */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  opacity: 0.8;
+}

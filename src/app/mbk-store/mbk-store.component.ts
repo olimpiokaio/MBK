@@ -4,7 +4,8 @@ import { BackButtonComponent } from '../shared/back-button/back-button.component
 import { CoinService } from '../services/coin.service';
 import { Subscription } from 'rxjs';
 import { SelosService } from '../services/selos.service';
-import {FooterComponent} from "../footer/footer.component";
+import { FooterComponent } from "../footer/footer.component";
+import { UserDataService } from '../services/user-data.service';
 
 type StoreItem = { id: string; name: string; src: string; cost: number };
 
@@ -23,11 +24,11 @@ export class MbkStoreComponent implements OnDestroy, AfterViewInit {
   displayBalance = 0;
   // Flag para classe de animação visual ao gastar
   spendingPulse = false;
+  // Flag para indicar se os dados da loja foram carregados do Firebase
+  storeLoaded = false;
   private sub?: Subscription;
 
   readonly COST = 10;
-  readonly STORAGE_KEY = 'mbk.store.purchased.backgrounds';
-  readonly APPLIED_KEY_BASE = 'mbk.store.applied.background';
 
   // Lista de GIFs disponíveis na pasta public/background-modal
   items: StoreItem[] = [
@@ -62,14 +63,17 @@ export class MbkStoreComponent implements OnDestroy, AfterViewInit {
     'the-nyan-cat.gif',
     'trikey-drama.gif',
     'wawa.gif',
-  ].map((file) => ({ id: file, name: file.replace('.gif',''), src: `background-modal/${file}`, cost: this.COST }));
+  ].map((file) => ({ id: file.replace('.gif',''), name: file.replace('.gif',''), src: `background-modal/${file}`, cost: this.COST }));
 
-  private purchasedSet = new Set<string>(this.readPurchased());
+  private purchasedSet = new Set<string>();
+  private appliedId: string | null = null;
 
-  constructor(private coins: CoinService, private selos: SelosService) {
-    this.balance = this.coins.getBalance();
-    this.displayBalance = this.balance;
+  constructor(private coins: CoinService, private selos: SelosService, private userData: UserDataService) {
+    // Não ler saldo síncrono aqui - aguardar o observable carregar do Firebase
     this.sub = this.coins.balanceObservable.subscribe(v => {
+      // Ignora valores null (ainda não carregado do Firebase)
+      if (v === null) return;
+
       const prevDisplay = this.displayBalance;
       this.balance = v;
       // Anima somente quando diminuir (compra), senão atualiza direto
@@ -79,6 +83,24 @@ export class MbkStoreComponent implements OnDestroy, AfterViewInit {
         this.displayBalance = v;
       }
     });
+
+    // Carregar compras e aplicado do Firebase
+    this.initStoreFromDb();
+  }
+
+  private async initStoreFromDb() {
+    try {
+      const store = await this.userData.getStoreOnce();
+      this.purchasedSet = new Set<string>(Object.keys(store.purchased.backgrounds || {}));
+      this.appliedId = store.applied.background ?? null;
+    } catch {
+      // Em caso de erro, inicializa com valores vazios
+      this.purchasedSet = new Set<string>();
+      this.appliedId = null;
+    } finally {
+      // Marca como carregado independentemente de sucesso ou erro
+      this.storeLoaded = true;
+    }
   }
 
   isPurchased(item: StoreItem): boolean {
@@ -89,52 +111,39 @@ export class MbkStoreComponent implements OnDestroy, AfterViewInit {
     return !this.isPurchased(item) && this.balance >= item.cost;
   }
 
-  buy(item: StoreItem) {
+  async buy(item: StoreItem) {
     if (!this.canBuy(item)) return;
-    this.coins.addCoins(-item.cost);
-    this.purchasedSet.add(item.id);
-    this.persistPurchased();
-    this.triggerSpendPulse();
-  }
-
-  // === APLICAR/REMOVER BG ===
-  private appliedKeyForCurrent(): string {
-    const player = this.selos.currentPlayerName;
-    return player ? `${this.APPLIED_KEY_BASE}.${player}` : this.APPLIED_KEY_BASE;
-  }
-
-  getAppliedId(): string | null {
-    try { return localStorage.getItem(this.appliedKeyForCurrent()); } catch { return null; }
-  }
-
-  isApplied(item: StoreItem): boolean {
-    return this.getAppliedId() === item.id;
-  }
-
-  apply(item: StoreItem) {
-    if (!this.isPurchased(item)) return;
-    try { localStorage.setItem(this.appliedKeyForCurrent(), item.id); } catch {}
-  }
-
-  clearApplied() {
-    try { localStorage.removeItem(this.appliedKeyForCurrent()); } catch {}
-  }
-
-  private readPurchased(): string[] {
     try {
-      const raw = localStorage.getItem(this.STORAGE_KEY);
-      if (!raw) return [];
-      const arr = JSON.parse(raw);
-      return Array.isArray(arr) ? arr : [];
-    } catch {
-      return [];
+      // Primeiro tenta gravar no Firebase
+      await this.userData.purchaseBackground(item.id);
+      // Só atualiza estado local e deduz moedas se gravação foi bem-sucedida
+      this.purchasedSet.add(item.id);
+      this.coins.addCoins(-item.cost);
+      this.triggerSpendPulse();
+    } catch (error) {
+      console.error('Erro ao comprar item:', error);
+      // Poderia mostrar mensagem de erro ao usuário aqui
     }
   }
 
-  private persistPurchased() {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(Array.from(this.purchasedSet)));
-    } catch {}
+  // === APLICAR/REMOVER BG ===
+  getAppliedId(): string | null {
+    return this.appliedId;
+  }
+
+  isApplied(item: StoreItem): boolean {
+    return this.appliedId === item.id;
+  }
+
+  async apply(item: StoreItem) {
+    if (!this.isPurchased(item)) return;
+    this.appliedId = item.id;
+    await this.userData.applyBackground(item.id);
+  }
+
+  async clearApplied() {
+    this.appliedId = null;
+    await this.userData.applyBackground(null);
   }
 
   private triggerSpendPulse() {

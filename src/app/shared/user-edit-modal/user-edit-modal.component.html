@@ -1,0 +1,27 @@
+<div class="backdrop" (click)="onClose()"></div>
+<div class="modal" role="dialog" aria-modal="true">
+  <h2>Editar Perfil</h2>
+
+  <div class="content">
+    <div class="preview">
+      <img [src]="avatarUrl || player.playerImage" alt="Avatar" />
+    </div>
+
+    <form (ngSubmit)="onSave()">
+      <label>
+        Nome
+        <input type="text" [(ngModel)]="name" name="name" maxlength="40" required />
+      </label>
+
+      <label>
+        URL da foto
+        <input type="url" [(ngModel)]="avatarUrl" name="avatarUrl" placeholder="https://..." />
+      </label>
+
+      <div class="actions">
+        <button type="button" class="btn secondary" (click)="onClose()">Cancelar</button>
+        <button type="submit" class="btn primary">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>

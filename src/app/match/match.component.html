@@ -1,6 +1,19 @@
 <section class="content-match">
   <div class="top-bar">
-    <app-back-button [back]="true" ariaLabel="Voltar" label="← VOLTAR" />
+    @if (!gameStarted()) {
+      <app-back-button [back]="true" ariaLabel="Voltar" label="← VOLTAR" />
+    } @else if (winner() === null) {
+      <button class="exit-match-btn" (click)="onExitMatch()" title="Sair da partida">
+        <span class="btn-text">SAIR DA PARTIDA</span>
+        <span class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </span>
+      </button>
+    }
   </div>
 
   <!-- SELEÇÃO E RESUMO (antes de iniciar o jogo) -->
@@ -10,22 +23,66 @@
       <p class="match-sub">jogadores da comunidade · <span class="badge-count">{{ players().length }}</span></p>
     </header>
 
-    <!-- Team chooser blocks -->
     @if (!allSelected()) {
       <div class="teams-select">
-        <button class="team-card" [class.active]="selectedTeam() === 'A'" (click)="chooseTeam('A')" type="button">
+        <button id="teamA"
+                class="team-card"
+                [class.active]="selectedTeam() === 'A'"
+                (click)="chooseTeam('A')"
+                type="button">
           <h1 class="team-title">Time A</h1>
-          <div class="team-count">{{ teamA().length }} / {{ maxPerTeam }}</div>
+          <div class="team-slots">
+            @for (slot of [0, 1, 2]; track $index) {
+              <div class="slot" [class.filled]="$index < teamA().length">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+            }
+          </div>
         </button>
-        <button class="team-card" [class.active]="selectedTeam() === 'B'" (click)="chooseTeam('B')" type="button">
+        <button id="teamB"
+                class="team-card"
+                [class.active]="selectedTeam() === 'B'"
+                (click)="chooseTeam('B')"
+                type="button">
           <h1 class="team-title">Time B</h1>
-          <div class="team-count">{{ teamB().length }} / {{ maxPerTeam }}</div>
+          <div class="team-slots">
+            @for (slot of [0, 1, 2]; track $index) {
+              <div class="slot" [class.filled]="$index < teamB().length">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+            }
+          </div>
         </button>
       </div>
     }
 
     @if (!selectedTeam() && !allSelected()) {
-      <p class="hint">Selecione um time para começar a escolher os jogadores.</p>
+      <p class="hint">Selecione um time para escalar os jogadores.</p>
+    }
+
+    <!-- Search and Filters -->
+    @if (!allSelected() && !loadingPlayers()) {
+      <div class="search-filters">
+        <div class="search-box">
+          <input type="text"
+                 [(ngModel)]="searchQuery"
+                 placeholder="Buscar jogador..."
+                 class="search-input" />
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <div class="filter-group">
+          <button (click)="sortBy.set('name')" [class.active]="sortBy() === 'name'">Nome</button>
+          <button (click)="sortBy.set('level')" [class.active]="sortBy() === 'level'">Nível</button>
+          <button (click)="sortBy.set('points')" [class.active]="sortBy() === 'points'">Pontos</button>
+        </div>
+      </div>
     }
 
     <!-- Players list for current selection -->
@@ -34,10 +91,10 @@
         <app-loading-spinner text="Carregando jogadores…" />
       } @else {
         <div class="players-grid">
-          @if (players().length === 0) {
-            <p class="empty">Nenhum jogador encontrado para esta comunidade.</p>
+          @if (filteredPlayers().length === 0) {
+            <p class="empty">Nenhum jogador encontrado com esses filtros.</p>
           } @else {
-            @for (p of players(); track $index) {
+            @for (p of filteredPlayers(); track $index) {
               <article class="player-card"
                        [class.selected]="isSelectedForCurrent(p)"
                        [class.disabled]="!canSelect(p) && !isSelectedForCurrent(p)"
@@ -54,6 +111,7 @@
                     <li><span class="stat-label">Pontos</span><span class="stat-value">{{ p.totalPoints }}</span></li>
                   </ul>
                 </div>
+
               </article>
             }
           }
@@ -79,7 +137,11 @@
 
               <div class="cards-rail" aria-live="polite">
                 @for (p of getTriplet('A'); track p.playerName; let i = $index) {
-                  <article class="hero-card" [class.center]="i === 1" [class.left]="i === 0" [class.right]="i === 2">
+                  <article class="hero-card" [class.center]="i === 1" [class.left]="i === 0" [class.right]="i === 2"
+                           [style.backgroundImage]="p.activeBackground ? 'url(' + p.activeBackground + '), radial-gradient(circle at 20% -20%, rgba(255,196,0,0.12), transparent 52%), radial-gradient(circle at 120% 120%, rgba(109,61,255,0.12), transparent 52%), linear-gradient(160deg, rgba(10,10,46,0.6), rgba(20,20,58,0.6))' : ''"
+                           [style.backgroundSize]="'cover'"
+                           [style.backgroundRepeat]="'no-repeat'"
+                           [style.backgroundPosition]="'center'">
                     <div class="hero-photo-wrap">
                       <img class="hero-photo" [src]="p.playerImage" [alt]="p.playerName" loading="lazy" />
                       <span class="hero-lvl">LV {{ p.level }}</span>
@@ -118,7 +180,11 @@
 
               <div class="cards-rail" aria-live="polite">
                 @for (p of getTriplet('B'); track p.playerName; let i = $index) {
-                  <article class="hero-card" [class.center]="i === 1" [class.left]="i === 0" [class.right]="i === 2">
+                  <article class="hero-card" [class.center]="i === 1" [class.left]="i === 0" [class.right]="i === 2"
+                           [style.backgroundImage]="p.activeBackground ? 'url(' + p.activeBackground + '), radial-gradient(circle at 20% -20%, rgba(255,196,0,0.12), transparent 52%), radial-gradient(circle at 120% 120%, rgba(109,61,255,0.12), transparent 52%), linear-gradient(160deg, rgba(10,10,46,0.6), rgba(20,20,58,0.6))' : ''"
+                           [style.backgroundSize]="'cover'"
+                           [style.backgroundRepeat]="'no-repeat'"
+                           [style.backgroundPosition]="'center'">
                     <div class="hero-photo-wrap">
                       <img class="hero-photo" [src]="p.playerImage" [alt]="p.playerName" loading="lazy" />
                       <span class="hero-lvl">LV {{ p.level }}</span>
@@ -271,6 +337,7 @@
         <div class="end-actions">
           <button class="stats-btn" type="button" (click)="openStats()">Ver Estatísticas</button>
           <button class="reset-btn" type="button" (click)="resetSelection()">Nova Partida</button>
+          <button class="home-btn" type="button" (click)="goToHome()">Ir para o Home</button>
         </div>
       }
 
@@ -295,6 +362,33 @@
         (confirm)="confirmAdjust($event)"
         (cancel)="closeModal()"
       />
+
+      <app-logout-modal
+        [open]="showExitMatchModal()"
+        title="ENCERRAR PARTIDA?"
+        description="Deseja realmente sair? Se sair agora, os pontos não serão computados."
+        confirmText="ENCERRAR"
+        cancelText="CONTINUAR"
+        (confirm)="confirmExitMatch()"
+        (cancel)="cancelExitMatch()"
+      ></app-logout-modal>
+
+      <!-- Global 3-Point Celebration Overlay -->
+      @if (globalCelebration()) {
+        <div class="global-celebration-overlay">
+          <div class="celebration-content">
+            <div class="celebration-player">
+              <img [src]="globalCelebration()?.playerImage" [alt]="globalCelebration()?.playerName" class="player-photo" />
+              <div class="player-name">{{ globalCelebration()?.playerName }}</div>
+            </div>
+            <div class="three-pts-badge">
+              <img src="3pontos.png" alt="3 PONTOS!" class="badge-img" />
+              <div class="badge-text">3 PONTOS!</div>
+            </div>
+            <div class="nba-glow"></div>
+          </div>
+        </div>
+      }
     </section>
   }
 </section>

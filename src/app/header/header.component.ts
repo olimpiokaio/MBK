@@ -1,27 +1,53 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { BackgroundMusicService } from '../services/background-music.service';
+import { AuthService } from '../services/auth.service';
+import { LogoutModalComponent } from '../shared/logout-modal/logout-modal.component';
+import { MatchService } from '../services/match.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, LogoutModalComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
 export class HeaderComponent implements OnDestroy {
   faded = false; // controls slight visibility state
   isPaused = false; // UI state for play/pause toggle
+  showLogoutModal = false;
 
   private idleTimer?: any;
   private readonly idleMs = 8000; // 8 seconds
 
-  constructor(private music: BackgroundMusicService) {}
+  private music = inject(BackgroundMusicService);
+  auth = inject(AuthService);
+  private router = inject(Router);
+  matchService = inject(MatchService);
+
+  user = this.auth.currentUser;
+
+  // Track if current route is home ('/')
+  isHome = false;
+  // Track if current route is login ('/login')
+  isLogin = false;
 
   ngOnInit() {
     this.isPaused = this.music.isPaused();
     this.resetIdleTimer();
+
+    // initialize flags and subscribe to changes
+    const url = this.router.url || '';
+    this.isHome = url === '/' || url === '';
+    this.isLogin = url.startsWith('/login');
+    this.router.events.subscribe(ev => {
+      if (ev instanceof NavigationEnd) {
+        const u = ev.urlAfterRedirects || '';
+        this.isHome = u === '/' || u === '';
+        this.isLogin = u.startsWith('/login');
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -38,6 +64,28 @@ export class HeaderComponent implements OnDestroy {
     this.music.next();
     this.isPaused = this.music.isPaused();
     this.onInteract();
+  }
+
+  onPrevious() {
+    this.music.previous();
+    this.isPaused = this.music.isPaused();
+    this.onInteract();
+  }
+
+  onLogout() {
+    this.showLogoutModal = true;
+    this.onInteract();
+  }
+
+  confirmLogout() {
+    this.showLogoutModal = false;
+    // Realiza logout e redireciona para a tela de login
+    this.auth.logout();
+    try { this.router.navigateByUrl('/login'); } catch {}
+  }
+
+  cancelLogout() {
+    this.showLogoutModal = false;
   }
 
   // Called on any interaction with the header (mouse move, click, focus, touch)

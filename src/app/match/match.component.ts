@@ -1,5 +1,6 @@
-import { Component, computed, inject, signal, OnDestroy, effect } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, computed, inject, signal, OnDestroy, effect, Renderer2, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { PlayersService } from '../services/players.service';
 import { Player } from '../shared/types/player.model';
 import { BackButtonComponent } from '../shared/back-button/back-button.component';
@@ -12,22 +13,38 @@ import { CardQualificacaoComponent } from '../shared/card-qualificacao/card-qual
 import { LoadingSpinnerComponent } from '../shared/loading-spinner/loading-spinner.component';
 import { AdjustPointsModalComponent } from '../shared/adjust-points-modal/adjust-points-modal.component';
 import { StatsModalComponent } from '../shared/stats-modal/stats-modal.component';
+import { ProfileService } from '../services/profile.service';
+import { LogoutModalComponent } from '../shared/logout-modal/logout-modal.component';
+import { MatchService } from '../services/match.service';
 
 @Component({
   selector: 'app-match',
   standalone: true,
-  imports: [BackButtonComponent, TeamPlayersColumnComponent, CardQualificacaoComponent, LoadingSpinnerComponent, AdjustPointsModalComponent, StatsModalComponent],
+  imports: [
+    BackButtonComponent,
+    TeamPlayersColumnComponent,
+    CardQualificacaoComponent,
+    LoadingSpinnerComponent,
+    AdjustPointsModalComponent,
+    StatsModalComponent,
+    LogoutModalComponent,
+    FormsModule
+  ],
   templateUrl: './match.component.html',
   styleUrl: './match.component.css'
 })
-export class MatchComponent implements OnDestroy {
+export class MatchComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private playersService = inject(PlayersService);
   private narrator = inject(NarratorService);
   private stats = inject(StatisticsService);
   private selos = inject(SelosService);
   // Coins
   private coins = inject(CoinService);
+  private profile = inject(ProfileService);
+  private renderer = inject(Renderer2);
+  private matchService = inject(MatchService);
 
   // Loading state
   loadingPlayers = signal<boolean>(true);
@@ -35,6 +52,30 @@ export class MatchComponent implements OnDestroy {
   communityId = signal<string>('');
   communityName = signal<string>('');
   players = signal<Player[]>([]);
+
+  // Search and Filter state
+  searchQuery = signal<string>('');
+  sortBy = signal<'name' | 'level' | 'points'>('name');
+
+  filteredPlayers = computed(() => {
+    let list = this.players().filter(p => !this.isSelected(p));
+    const query = this.searchQuery().toLowerCase().trim();
+
+    if (query) {
+      list = list.filter(p => p.playerName.toLowerCase().includes(query));
+    }
+
+    return list.sort((a, b) => {
+      if (this.sortBy() === 'level') return b.level - a.level;
+      if (this.sortBy() === 'points') return b.totalPoints - a.totalPoints;
+      return a.playerName.localeCompare(b.playerName);
+    });
+  });
+
+  private isSelected(p: Player): boolean {
+    return this.teamA().some(tp => tp.playerName === p.playerName) ||
+           this.teamB().some(tp => tp.playerName === p.playerName);
+  }
 
   // Selection state
   selectedTeam = signal<'A' | 'B' | null>(null);
@@ -82,6 +123,15 @@ export class MatchComponent implements OnDestroy {
     }
   }, { allowSignalWrites: true });
 
+
+  matchBgEffect = effect(() => {
+    if (this.gameStarted()) {
+      this.renderer.addClass(document.body, 'in-match');
+    } else {
+      this.renderer.removeClass(document.body, 'in-match');
+    }
+  });
+
   prev(team: 'A' | 'B') {
     const list = team === 'A' ? this.sortedTeamA() : this.sortedTeamB();
     if (!list.length) return;
@@ -120,6 +170,7 @@ export class MatchComponent implements OnDestroy {
   scoreboardPulse = signal<boolean>(false);
   confettiSide = signal<'A' | 'B' | null>(null);
   mobileTab = signal<'A' | 'B'>('A');
+  showExitMatchModal = signal<boolean>(false);
 
   // Statistics state
   statsOpen = signal<boolean>(false);
@@ -146,6 +197,29 @@ export class MatchComponent implements OnDestroy {
         this.loadingPlayers.set(false);
       }
     });
+
+    // Reagir a alterações de perfil (nome/avatar) antes do jogo começar
+    effect(() => {
+      const p = this.profile.profile();
+      // access values to establish dependency
+      const name = p.name;
+      const avatar = p.avatar;
+      // Se o jogo ainda não começou, recarrega a lista de jogadores da comunidade
+      if (!this.gameStarted()) {
+        const cid = this.communityId();
+        if (!cid) return;
+        this.loadingPlayers.set(true);
+        this.playersService.getPlayersByCommunity(cid).subscribe({
+          next: (list) => {
+            this.players.set(list);
+            this.loadingPlayers.set(false);
+          },
+          error: () => {
+            this.loadingPlayers.set(false);
+          }
+        });
+      }
+    }, { allowSignalWrites: true });
   }
 
   chooseTeam(team: 'A' | 'B') {
@@ -358,6 +432,10 @@ export class MatchComponent implements OnDestroy {
 
     // Award selos for the current user based on scoring action (2 or 3 points)
     if (delta > 0) {
+      if (points === 3) {
+        this.globalCelebration.set({ playerName: player.playerName, playerImage: player.playerImage });
+        setTimeout(() => this.globalCelebration.set(null), 3000);
+      }
       const me = this.selos.currentPlayerName;
       if (me && player.playerName === me && points > 0) {
         if (points === 2) {
@@ -372,6 +450,7 @@ export class MatchComponent implements OnDestroy {
   // Modal logic for choosing to add or subtract points
   modalOpen = signal<boolean>(false);
   pendingAction = signal<{ team: 'A' | 'B'; player: Player; points: number } | null>(null);
+  globalCelebration = signal<{ playerName: string; playerImage: string } | null>(null);
 
   openAdjustPoints(team: 'A' | 'B', player: Player, points: number) {
     if (!this.gameStarted() || this.winner() || !this.running()) return;
@@ -563,6 +642,23 @@ export class MatchComponent implements OnDestroy {
   openStats() { if (this.winner() !== null) this.statsOpen.set(true); }
   closeStats() { this.statsOpen.set(false); }
 
+  goToHome() {
+    this.router.navigate(['/']);
+  }
+
+  onExitMatch() {
+    this.showExitMatchModal.set(true);
+  }
+
+  confirmExitMatch() {
+    this.showExitMatchModal.set(false);
+    this.router.navigate(['/']); // Voltar para a home
+  }
+
+  cancelExitMatch() {
+    this.showExitMatchModal.set(false);
+  }
+
     // Helper to get the team array of a given player by name
     teamFor(p: Player): Player[] {
       if (!p) return [];
@@ -576,10 +672,17 @@ export class MatchComponent implements OnDestroy {
     return 'bronze';
   }
 
+  ngOnInit(): void {
+    this.matchService.setIsInMatch(true);
+  }
+
   ngOnDestroy(): void {
     // Ensure narrator stops speaking when leaving the match screen
     try { this.narrator.stop(); } catch {}
     // Also stop any running timers to avoid leaks
     try { this.stopTimer(); } catch {}
+    // Reset global background
+    this.renderer.removeClass(document.body, 'in-match');
+    this.matchService.setIsInMatch(false);
   }
 }

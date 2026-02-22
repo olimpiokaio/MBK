@@ -1,7 +1,10 @@
-import { Injectable } from '@angular/core';
-import { of, Observable } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { Observable, from } from 'rxjs';
+import { delay, map } from 'rxjs/operators';
 import { Player } from '../shared/types/player.model';
+import { AuthService } from './auth.service';
+import { ProfileService } from './profile.service';
+import { UserDataService } from './user-data.service';
 
 /**
  * PlayersService simula chamadas HTTP para buscar jogadores por comunidade.
@@ -9,6 +12,10 @@ import { Player } from '../shared/types/player.model';
  */
 @Injectable({ providedIn: 'root' })
 export class PlayersService {
+  private auth = inject(AuthService);
+  private profile = inject(ProfileService);
+  private userData = inject(UserDataService);
+
   // Dados mockados: jogadores por id de comunidade
   private readonly playersByCommunity: Record<string, Player[]> = {
     '1': [
@@ -63,7 +70,48 @@ export class PlayersService {
 
   /** Retorna jogadores da comunidade simulando uma chamada HTTP. */
   getPlayersByCommunity(communityId: string): Observable<Player[]> {
-    const players = this.playersByCommunity[communityId] ?? [];
-    return of(players).pipe(delay(600));
+    const base = this.playersByCommunity[communityId] ?? [];
+    return from(Promise.all([
+      this.userData.getStatsOnce(),
+      this.userData.getStoreOnce()
+    ])).pipe(
+      delay(600),
+      map(([stats, store]) => this.buildPlayersWithStats(base, stats, store, communityId))
+    );
+  }
+
+  private buildPlayersWithStats(
+    base: Player[],
+    stats: { level: number; totalPoints: number },
+    store: any,
+    communityId: string
+  ): Player[] {
+    let players = [...base];
+    const user = this.auth.currentUser();
+    if (user && communityId === '1') {
+      const prof = this.profile.profile();
+      const name = prof.name || user.username;
+      const avatar = prof.avatar || 'https://i.pinimg.com/originals/a4/0a/db/a40adbb4e98486e06a57bc75c4b06600.jpg';
+      const age = this.calcAge(user.dob);
+
+      let background = null;
+      if (store?.applied?.background) {
+        background = `background-modal/${store.applied.background}.gif`;
+      }
+
+      const me = new Player(name, avatar, age, stats.level ?? 1, stats.totalPoints ?? 0, background);
+      const idx = players.findIndex(p => p.playerName.toLowerCase() === name.toLowerCase());
+      if (idx >= 0) players[idx] = me; else players.unshift(me);
+    }
+    return players;
+  }
+
+  private calcAge(dobIso: string): number {
+    const dob = new Date(dobIso);
+    const now = new Date();
+    let age = now.getFullYear() - dob.getFullYear();
+    const m = now.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && now.getDate() < dob.getDate())) age--;
+    return Math.max(0, age);
   }
 }

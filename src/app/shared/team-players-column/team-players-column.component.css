@@ -20,22 +20,39 @@
   border: 1px solid rgba(255,255,255,0.5);
   letter-spacing: 0.5px;
 }
-.team-a-col > h3 { background: linear-gradient(90deg, rgba(45,211,111,0.25), rgba(45,211,111,0.05)); border-color: rgba(45,211,111,0.7); }
-.team-b-col > h3 { background: linear-gradient(90deg, rgba(109,61,255,0.25), rgba(109,61,255,0.05)); border-color: rgba(109,61,255,0.7); }
+.team-a-col > h3 { background: linear-gradient(90deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0.05)); border-color: rgba(0, 255, 136, 0.5); }
+.team-b-col > h3 { background: linear-gradient(90deg, rgba(125, 77, 255, 0.2), rgba(125, 77, 255, 0.05)); border-color: rgba(125, 77, 255, 0.5); }
 
 .player-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 8px 8px 10px; /* left padding matches h3 (10px) for visual alignment */
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
 }
 /* Stronger per-team row separators and hover for readability */
-.team-a-col .player-row { border-left: 4px solid rgba(45,211,111,0.6); background: linear-gradient(90deg, rgba(45,211,111,0.08), rgba(255,255,255,0.02)); }
-.team-b-col .player-row { border-left: 4px solid rgba(109,61,255,0.6); background: linear-gradient(90deg, rgba(109,61,255,0.08), rgba(255,255,255,0.02)); }
-.team-a-col .player-row:hover { background: linear-gradient(90deg, rgba(45,211,111,0.16), rgba(255,255,255,0.04)); }
-.team-b-col .player-row:hover { background: linear-gradient(90deg, rgba(109,61,255,0.16), rgba(255,255,255,0.04)); }
+.team-a-col .player-row {
+  border-left: 4px solid #00ff88;
+  background: linear-gradient(90deg, rgba(0, 255, 136, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+.team-b-col .player-row {
+  border-left: 4px solid #7d4dff;
+  background: linear-gradient(90deg, rgba(125, 77, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+.team-a-col .player-row:hover {
+  background: linear-gradient(90deg, rgba(0, 255, 136, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+  transform: translateX(4px);
+  border-color: rgba(0, 255, 136, 0.3);
+}
+.team-b-col .player-row:hover {
+  background: linear-gradient(90deg, rgba(125, 77, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+  transform: translateX(4px);
+  border-color: rgba(125, 77, 255, 0.3);
+}
 .info {
   display: flex;
   align-items: center;
@@ -55,12 +72,13 @@
   transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 /* Color glow per team to give more prominence */
-.team-a-col .avatar-sm { box-shadow: 0 0 0 3px rgba(45,211,111,0.35), 0 6px 14px rgba(45,211,111,0.18); }
-.team-b-col .avatar-sm { box-shadow: 0 0 0 3px rgba(109,61,255,0.35), 0 6px 14px rgba(109,61,255,0.18); }
+.team-a-col .avatar-sm { box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.35), 0 6px 14px rgba(0, 255, 136, 0.18); }
+.team-b-col .avatar-sm { box-shadow: 0 0 0 3px rgba(125, 77, 255, 0.35), 0 6px 14px rgba(125, 77, 255, 0.18); }
 /* Keep special borders for top/bottom players above the team glow */
 .fire-border { border-color: #ff7300; }
 .ice-border { border-color: #00c2ff; }
 .player-row:hover .avatar-sm { transform: scale(1.06); }
+
 .icon-badge {
   position: absolute;
   bottom: -6px;
@@ -72,6 +90,35 @@
 .actions {
   display: flex;
   gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .player-row {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+  .info {
+    gap: 6px;
+  }
+  .avatar-sm {
+    width: 44px;
+    height: 44px;
+    border-width: 2px;
+  }
+  .name {
+    font-size: 0.9rem;
+  }
+  .match-pts {
+    font-size: 0.8rem;
+  }
+  .actions {
+    gap: 4px;
+  }
+  .actions .bb-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1.4rem;
+  }
 }
 
 /* Basketball buttons */

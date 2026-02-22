@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, EventEmitter, Output, input } from '@angular/core';
 import type { Player } from '../types/player.model';
 
 @Component({
@@ -10,4 +10,5 @@ import type { Player } from '../types/player.model';
 })
 export class CardPlayComponent {
   player = input.required<Player>();
+  @Output() cardClick = new EventEmitter<void>();
 }
