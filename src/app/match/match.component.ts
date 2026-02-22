@@ -534,9 +534,10 @@ export class MatchComponent implements OnInit, OnDestroy {
           const won = winnersArr.some(p => p.playerName === meName);
           if (won) {
             this.selos.earn('selo-primeira-vitoria');
-            const streak = this.selos.incWinStreak();
-            if (streak >= 3) this.selos.earn('selo-imparavel');
-            if (streak >= 5) this.selos.earn('selo-lenda');
+            this.selos.incWinStreak().then(streak => {
+              if (streak >= 3) this.selos.earn('selo-imparavel');
+              if (streak >= 5) this.selos.earn('selo-lenda');
+            });
           } else {
             this.selos.resetWinStreak();
           }

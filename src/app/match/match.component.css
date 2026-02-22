@@ -1237,6 +1237,34 @@
 
   /* Carousel: improve touch targets and reduce visual clutter */
   .team-carousel { gap: 0.4rem; }
+
+  .teams-select {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .team-card {
+    padding: 0.6rem;
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    display: flex; /* Ensure it's flex for column layout */
+  }
+
+  .team-card .team-title {
+    font-size: 0.9rem;
+  }
+
+  .team-slots {
+    margin-top: 0.2rem;
+    gap: 0.2rem;
+  }
+
+  .slot {
+    width: 20px;
+    height: 20px;
+  }
+
   .nav-btn {
     width: 44px; height: 44px; /* recommended minimum touch target */
     font-size: 1.35rem;

@@ -54,8 +54,6 @@ export class HomeComponent implements OnInit {
       stats.level ?? 1,
       stats.totalPoints ?? 0
     );
-
-    try { this.selos.setCurrentPlayerName(this.player.playerName); } catch {}
   }
 
   private calcAge(dobIso: string): number {
@@ -81,7 +79,6 @@ export class HomeComponent implements OnInit {
     // Removida migração de localStorage: stats agora vêm do Firebase
 
     // Atualiza serviços dependentes do nome/avatar (também persiste override do perfil)
-    try { this.selos.setCurrentPlayerName(this.player.playerName); } catch {}
     try { this.profile.setProfile(this.player.playerName, this.player.playerImage); } catch {}
 
     // Sincroniza com o usuário logado (AuthService)
